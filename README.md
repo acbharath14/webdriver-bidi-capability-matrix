@@ -56,6 +56,11 @@ Requirements: Node.js 20+ and Chrome (or Chrome for Testing). Each tool
 manages its own browser/driver except where its NOTES.md says otherwise.
 
 ```sh
+# First run (or any fresh clone): preflight checks the setup and installs
+# any missing tool dependencies. The matrix runner does this automatically,
+# so you can also skip straight to `node run-matrix.cjs`.
+npm run preflight
+
 # Full matrix: starts the probe server, runs every suite, regenerates MATRIX.md
 node run-matrix.cjs
 
@@ -65,6 +70,9 @@ node run-matrix.cjs --tool selenium
 
 # Skip a tool
 node run-matrix.cjs --skip testplane
+
+# Skip the automatic preflight (dependencies already installed)
+node run-matrix.cjs --no-preflight
 ```
 
 Per-tool suites also run standalone (they need the probe server running):
@@ -112,6 +120,7 @@ tools/cypress/       Cypress spec (Firefox) + config + wrapper + NOTES.md
 tools/mcp/           MCP client suite (Firefox DevTools MCP) + NOTES.md
 tools/firefox/       downloaded Firefox binary (gitignored, not committed)
 run-matrix.cjs       runner + MATRIX.md generator
+scripts/preflight.cjs  setup checks + missing-dependency installs (auto-runs in run-matrix.cjs)
 MATRIX.md            generated report (do not hand-edit)
 ```
 

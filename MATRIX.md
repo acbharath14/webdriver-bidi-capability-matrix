@@ -1,7 +1,7 @@
 # WebDriver BiDi capability matrix
 
 > Generated from actual suite runs by `node run-matrix.cjs` — do not hand-edit.
-> Generated: 2026-10-26T02:06:24.006Z (UTC). Probe app: local Node server on port 4333.
+> Generated: 2026-10-26T03:27:37.642Z (UTC). Probe app: local Node server on port 4333.
 > Scope: stable releases only, BiDi-supporting tools only (see README.md for the exclusion list).
 
 ## Capability × tool
@@ -23,12 +23,12 @@
 
 | Tool | PASS | FAIL | SKIP | NOT-RUN | Run status | Notes |
 |---|---|---|---|---|---|---|
-| Vibium | 10 | 0 | 0 | 0 | ok (10s) | [notes](tools/vibium/NOTES.md) |
-| Puppeteer | 10 | 0 | 0 | 0 | ok (5s) | [notes](tools/puppeteer/NOTES.md) |
+| Vibium | 10 | 0 | 0 | 0 | ok (9s) | [notes](tools/vibium/NOTES.md) |
+| Puppeteer | 10 | 0 | 0 | 0 | ok (6s) | [notes](tools/puppeteer/NOTES.md) |
 | Selenium | 9 | 0 | 1 | 0 | ok (5s) | [notes](tools/selenium/NOTES.md) |
-| WebdriverIO | 8 | 0 | 2 | 0 | ok (6s) | [notes](tools/webdriverio/NOTES.md) |
-| Testplane | 7 | 0 | 3 | 0 | ok (9s) | [notes](tools/testplane/NOTES.md) |
-| Cypress | 7 | 0 | 3 | 0 | ok (21s) | [notes](tools/cypress/NOTES.md) |
+| WebdriverIO | 8 | 0 | 2 | 0 | ok (7s) | [notes](tools/webdriverio/NOTES.md) |
+| Testplane | 7 | 0 | 3 | 0 | ok (18s) | [notes](tools/testplane/NOTES.md) |
+| Cypress | 7 | 0 | 3 | 0 | ok (29s) | [notes](tools/cypress/NOTES.md) |
 | Firefox DevTools MCP | 7 | 0 | 3 | 0 | ok (28s) | [notes](tools/mcp/NOTES.md) |
 
 ## Per-tool evidence (detail strings from the runs)
@@ -64,7 +64,7 @@
 - Navigation events: **PASS** — landed http://127.0.0.1:4333/second
 - Console-log capture: **PASS** — probe-log
 - JS-error capture: **PASS** — Error: probe-thrown
-- Network request/response capture: **PASS** — {"_id":"06D8B89F7F683F3B2F918C1B86C5EF32","_navigation":null,"_redirectCount":0,"_request":{"_request":"8056.2","_url":"http://127.0.0.1:4333/api/ping","_method
+- Network request/response capture: **PASS** — {"_id":"C2147E5266ACD8D6E07B480AF0DC75E2","_navigation":null,"_redirectCount":0,"_request":{"_request":"3844.2","_url":"http://127.0.0.1:4333/api/ping","_method
 - Script evaluation: **PASS** — 1+1=2, title=BiDi Probe
 - Cookie get/set: **PASS** — probe=chocochip via BiDi storage
 - Screenshot: **PASS** — bytes=18601 png-signature=yes
@@ -116,7 +116,7 @@
 - Navigation events: **PASS** — href=http://127.0.0.1:4333/second
 - Console-log capture: **PASS** — { |   "total": 1, |   "filtered": 1, |   "showing": 1, |   "hasMore": false, |   "filters": "textContains=\"probe-log\"", |   "messages": [ |     { |       "level": "info", |       "text": "probe-log", |       "source": 
 - JS-error capture: **PASS** — { |   "total": 2, |   "filtered": 1, |   "showing": 1, |   "hasMore": false, |   "filters": "textContains=\"probe-thrown\"", |   "messages": [ |     { |       "level": "error", |       "text": "Error: probe-thrown", |   
-- Network request/response capture: **PASS** — { |   "total": 1, |   "showing": 1, |   "hasMore": false, |   "requests": [ |     { |       "id": "26-7d48202a-cfb8-4426-94be-9e95482105ad", |       "url": "http://127.0.0.1:4333/api/ping", |       "method": "GET", |  
+- Network request/response capture: **PASS** — { |   "total": 1, |   "showing": 1, |   "hasMore": false, |   "requests": [ |     { |       "id": "23-0b98a528-440d-4b29-86fe-85928972e2ef", |       "url": "http://127.0.0.1:4333/api/ping", |       "method": "GET", |  
 - Script evaluation: **PASS** — 1+1=2 title=BiDi Probe
 - Cookie get/set: **SKIP** — document.cookie round-trips via evaluate_script (probe=chocochip) but the server exposes no dedicated cookie tool
 - Screenshot: **PASS** — image image/png 40796 chars base64
@@ -127,8 +127,10 @@
 ## How to reproduce
 
 ```sh
-node run-matrix.cjs            # full matrix (starts the probe server itself)
+npm run preflight              # checks setup, installs missing tool deps
+node run-matrix.cjs            # full matrix (preflight runs automatically first)
 node run-matrix.cjs --tool vibium   # one tool only
+node run-matrix.cjs --no-preflight  # skip preflight (deps already installed)
 ```
 
 Per-tool suites also run standalone; see each tool's NOTES.md for its setup (drivers, ports, env vars).

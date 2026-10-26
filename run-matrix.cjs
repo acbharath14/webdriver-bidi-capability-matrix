@@ -124,11 +124,26 @@ function parseOutput(stdout) {
   const args = process.argv.slice(2);
   const only = [];
   const skip = new Set();
+  let noPreflight = false;
   for (let i = 0; i < args.length; i++) {
     if (args[i] === '--tool') only.push(args[++i]);
     else if (args[i] === '--skip') skip.add(args[++i]);
+    else if (args[i] === '--no-preflight') noPreflight = true;
   }
   const tools = TOOLS.filter(t => (only.length === 0 || only.includes(t.name)) && !skip.has(t.name));
+
+  // Preflight: checks setup and installs any missing tool dependencies, so a
+  // fresh clone just works. Skip with --no-preflight or PREFLIGHT=0.
+  if (!noPreflight && process.env.PREFLIGHT !== '0') {
+    console.log('Running preflight (installs any missing tool dependencies)...');
+    const preArgs = [];
+    for (const t of tools) preArgs.push('--tool', t.name);
+    const pre = spawnSync('node', [path.join(ROOT, 'scripts', 'preflight.cjs'), ...preArgs], { stdio: 'inherit' });
+    if (pre.status !== 0) {
+      console.error('PREFLIGHT FAILED — fix the items above, then re-run. (Skip with --no-preflight or PREFLIGHT=0.)');
+      process.exit(1);
+    }
+  }
 
   const probe = await startProbe();
   console.log(`probe server on ${BASE}`);
@@ -231,7 +246,7 @@ function parseOutput(stdout) {
     md += '\n';
   }
   md += '## How to reproduce\n\n';
-  md += '```sh\nnode run-matrix.cjs            # full matrix (starts the probe server itself)\nnode run-matrix.cjs --tool vibium   # one tool only\n```\n\nPer-tool suites also run standalone; see each tool\'s NOTES.md for its setup (drivers, ports, env vars).\n';
+  md += '```sh\nnpm run preflight              # checks setup, installs missing tool deps\nnode run-matrix.cjs            # full matrix (preflight runs automatically first)\nnode run-matrix.cjs --tool vibium   # one tool only\nnode run-matrix.cjs --no-preflight  # skip preflight (deps already installed)\n```\n\nPer-tool suites also run standalone; see each tool\'s NOTES.md for its setup (drivers, ports, env vars).\n';
   fs.writeFileSync(path.join(ROOT, 'MATRIX.md'), md);
   fs.writeFileSync(path.join(ROOT, 'matrix-results.json'), JSON.stringify({ generatedAt: stamp, probePort: PORT, results }, null, 2));
   console.log('\nwrote MATRIX.md + matrix-results.json');
