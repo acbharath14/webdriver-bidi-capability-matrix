@@ -1,0 +1,13 @@
+node_modules/
+tools/*/node_modules/
+tools/*/results.json
+tools/firefox/
+tools/cypress/cypress/screenshots/
+tools/cypress/cypress/videos/
+tools/cypress/cypress/downloads/
+matrix-results.json
+*.log
+*.png
+.testplane/
+apps/probe/data/
+.DS_Store
