@@ -1,0 +1,87 @@
+# CI for webdriver-bidi-capability-matrix.
+#
+# HANDOFF NOTE (do not commit this comment block): the Meta Muse GitHub App
+# cannot push files under .github/workflows/, so this file goes in through
+# the GitHub web UI: repo -> Add file -> Create new file ->
+# path ".github/workflows/ci.yml" -> paste this file -> Commit.
+# The workflow itself is self-contained; nothing else needs to change.
+#
+# What it does: installs Node 22, installs Chrome + chromedriver as a
+# matched pair, installs each tool's locked dependencies, verifies the
+# Cypress binary, then runs the full matrix (node run-matrix.cjs).
+# The runner exits 1 on any FAIL cell or any tool with no output; SKIP
+# cells do not fail the run. MATRIX.md and the raw results are uploaded
+# as artifacts on every run, pass or fail.
+#
+# Environment notes (all verified against the suites' NOTES.md):
+# - Root package.json has no dependencies; the runner is stdlib-only.
+#   Each tools/<tool>/ has its own package.json + package-lock.json.
+# - WDIO and Testplane both use CHROMEDRIVER_BIN (started on port 9515 by
+#   the runner/wrapper, sequentially, so no port clash). Testplane's config
+#   already sets isolation: false, so no se:cdp capability is needed.
+# - Selenium Manager would resolve its own driver, but honors the
+#   CHROME_BIN / CHROMEDRIVER_BIN overrides when set (see selenium NOTES).
+# - Puppeteer and Vibium download and manage their own Chrome on install /
+#   first run; they ignore CHROME_BIN.
+# - Cypress runs against the runner's system Firefox (--browser firefox);
+#   the MCP suite needs FIREFOX_PATH pointed at it (see below).
+# - npm ci in tools/cypress normally downloads the Cypress binary via
+#   postinstall; `cypress verify` confirms it. If the download ever
+#   truncates, tools/cypress/NOTES.md documents the curl + local-zip
+#   fallback (CYPRESS_INSTALL_BINARY).
+
+name: BiDi matrix
+
+"on":
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  matrix:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install Chrome and chromedriver (matched pair)
+        id: chrome
+        uses: browser-actions/setup-chrome@v1
+        with:
+          chrome-version: stable
+
+      - name: Install each tool's locked dependencies
+        run: |
+          for dir in tools/*/; do
+            echo "--- npm ci in $dir ---"
+            (cd "$dir" && npm ci)
+          done
+
+      - name: Verify Cypress binary
+        run: cd tools/cypress && npx cypress verify
+
+      - name: Run the full matrix
+        run: |
+          CHROMEDRIVER_BIN="${{ steps.chrome.outputs.chromedriver-path }}" \
+          CHROME_BIN="${{ steps.chrome.outputs.chrome-path }}" \
+          FIREFOX_PATH="$(which firefox)" \
+          node run-matrix.cjs
+
+      - name: Upload matrix report and raw results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bidi-matrix-report
+          path: |
+            MATRIX.md
+            matrix-results.json
+            tools/*/results.json
