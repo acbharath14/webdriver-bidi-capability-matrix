@@ -1,7 +1,7 @@
 # WebDriver BiDi capability matrix
 
 > Generated from actual suite runs by `node run-matrix.cjs` — do not hand-edit.
-> Generated: 2026-10-26T03:27:37.642Z (UTC). Probe app: local Node server on port 4333.
+> Generated: 2026-10-27T01:55:33.282Z (UTC). Probe app: local Node server on port 4333.
 > Scope: stable releases only, BiDi-supporting tools only (see README.md for the exclusion list).
 
 ## Capability × tool
@@ -23,13 +23,13 @@
 
 | Tool | PASS | FAIL | SKIP | NOT-RUN | Run status | Notes |
 |---|---|---|---|---|---|---|
-| Vibium | 10 | 0 | 0 | 0 | ok (9s) | [notes](tools/vibium/NOTES.md) |
-| Puppeteer | 10 | 0 | 0 | 0 | ok (6s) | [notes](tools/puppeteer/NOTES.md) |
-| Selenium | 9 | 0 | 1 | 0 | ok (5s) | [notes](tools/selenium/NOTES.md) |
+| Vibium | 10 | 0 | 0 | 0 | ok (12s) | [notes](tools/vibium/NOTES.md) |
+| Puppeteer | 10 | 0 | 0 | 0 | ok (5s) | [notes](tools/puppeteer/NOTES.md) |
+| Selenium | 9 | 0 | 1 | 0 | ok (6s) | [notes](tools/selenium/NOTES.md) |
 | WebdriverIO | 8 | 0 | 2 | 0 | ok (7s) | [notes](tools/webdriverio/NOTES.md) |
-| Testplane | 7 | 0 | 3 | 0 | ok (18s) | [notes](tools/testplane/NOTES.md) |
-| Cypress | 7 | 0 | 3 | 0 | ok (29s) | [notes](tools/cypress/NOTES.md) |
-| Firefox DevTools MCP | 7 | 0 | 3 | 0 | ok (28s) | [notes](tools/mcp/NOTES.md) |
+| Testplane | 7 | 0 | 3 | 0 | ok (8s) | [notes](tools/testplane/NOTES.md) |
+| Cypress | 7 | 0 | 3 | 0 | ok (18s) | [notes](tools/cypress/NOTES.md) |
+| Firefox DevTools MCP | 7 | 0 | 3 | 0 | ok (30s) | [notes](tools/mcp/NOTES.md) |
 
 ## Per-tool evidence (detail strings from the runs)
 
@@ -41,7 +41,7 @@
 - Network request/response capture: **PASS** — url=http://127.0.0.1:4333/api/ping status=200
 - Script evaluation: **PASS** — 1+1=2, title=BiDi Probe
 - Cookie get/set: **PASS** — probe=chocochip via context API
-- Screenshot: **PASS** — bytes=19620 png-signature=yes
+- Screenshot: **PASS** — bytes=21465 png-signature=yes
 - Dialog handling: **PASS** — dismissed=dismissed confirmed=confirmed
 - Input / click: **PASS** — Hello, Ada
 - Network interception: **PASS** — pattern=**/api/ping fetch-result=intercepted
@@ -54,7 +54,7 @@
 - Network request/response capture: **PASS** — url=http://127.0.0.1:4333/api/ping status=200
 - Script evaluation: **PASS** — 1+1=2, title=BiDi Probe
 - Cookie get/set: **PASS** — probe=chocochip via page cookie API
-- Screenshot: **PASS** — bytes=20386 png-signature=yes
+- Screenshot: **PASS** — bytes=22331 png-signature=yes
 - Dialog handling: **PASS** — dismissed=dismissed confirmed=confirmed
 - Input / click: **PASS** — Hello, Ada
 - Network interception: **PASS** — fetch-result=intercepted
@@ -64,10 +64,10 @@
 - Navigation events: **PASS** — landed http://127.0.0.1:4333/second
 - Console-log capture: **PASS** — probe-log
 - JS-error capture: **PASS** — Error: probe-thrown
-- Network request/response capture: **PASS** — {"_id":"C2147E5266ACD8D6E07B480AF0DC75E2","_navigation":null,"_redirectCount":0,"_request":{"_request":"3844.2","_url":"http://127.0.0.1:4333/api/ping","_method
+- Network request/response capture: **PASS** — {"_id":"7445B34AADA4ADC9D08C2D886DBB9582","_navigation":null,"_redirectCount":0,"_request":{"_request":"96279.2","_url":"http://127.0.0.1:4333/api/ping","_metho
 - Script evaluation: **PASS** — 1+1=2, title=BiDi Probe
 - Cookie get/set: **PASS** — probe=chocochip via BiDi storage
-- Screenshot: **PASS** — bytes=18601 png-signature=yes
+- Screenshot: **PASS** — bytes=21044 png-signature=yes
 - Dialog handling: **SKIP** — userPromptOpened fires (1 observed) but handleUserPrompt fails 'no such alert': chromedriver mapper auto-dismisses prompts (confirm->dismissed); Classic alert API fails identically; accept path unusable
 - Input / click: **PASS** — Hello, Ada
 - Network interception: **PASS** — fetch-result=intercepted
@@ -80,7 +80,7 @@
 - Network request/response capture: **PASS** — url=http://127.0.0.1:4333/api/ping status=200
 - Script evaluation: **PASS** — 1+1=2 title=BiDi Probe
 - Cookie get/set: **PASS** — probe=chocochip via BiDi storage
-- Screenshot: **SKIP** — Classic saveScreenshot works (18298 bytes PNG) but WDIO v9 exposes no BiDi captureScreenshot surface
+- Screenshot: **SKIP** — Classic saveScreenshot works (20670 bytes PNG) but WDIO v9 exposes no BiDi captureScreenshot surface
 - Dialog handling: **PASS** — dialogs=[alert:probe-alert, confirm:probe-confirm, confirm:probe-confirm] dismissed+confirmed both observed
 - Input / click: **SKIP** — Classic click+setValue works (Hello, Ada) but WDIO v9 exposes no BiDi input.perform surface
 - Network interception: **PASS** — fetch-result=intercepted mock-calls=1
@@ -93,7 +93,7 @@
 - Network request/response capture: **PASS** — url=http://127.0.0.1:4333/api/ping status=200
 - Script evaluation: **PASS** — 1+1=2 title=BiDi Probe
 - Cookie get/set: **PASS** — probe=chocochip via BiDi storage
-- Screenshot: **SKIP** — Classic saveScreenshot works (18298 bytes PNG) but Testplane/WDIO expose no BiDi captureScreenshot surface
+- Screenshot: **SKIP** — Classic saveScreenshot works (20691 bytes PNG) but Testplane/WDIO expose no BiDi captureScreenshot surface
 - Dialog handling: **SKIP** — dialog events fire ([alert:probe-alert, confirm:probe-confirm, confirm:probe-confirm]) but accept()/dismiss() fail 'no such alert' (results: dismiss-leg=dismissed accept-leg=dismissed); prompt auto-dismissed before handling
 - Input / click: **SKIP** — Classic click+setValue works (Hello, Ada) but Testplane/WDIO expose no BiDi input.perform surface
 - Network interception: **PASS** — fetch-result=intercepted mock-calls=1
@@ -116,10 +116,10 @@
 - Navigation events: **PASS** — href=http://127.0.0.1:4333/second
 - Console-log capture: **PASS** — { |   "total": 1, |   "filtered": 1, |   "showing": 1, |   "hasMore": false, |   "filters": "textContains=\"probe-log\"", |   "messages": [ |     { |       "level": "info", |       "text": "probe-log", |       "source": 
 - JS-error capture: **PASS** — { |   "total": 2, |   "filtered": 1, |   "showing": 1, |   "hasMore": false, |   "filters": "textContains=\"probe-thrown\"", |   "messages": [ |     { |       "level": "error", |       "text": "Error: probe-thrown", |   
-- Network request/response capture: **PASS** — { |   "total": 1, |   "showing": 1, |   "hasMore": false, |   "requests": [ |     { |       "id": "23-0b98a528-440d-4b29-86fe-85928972e2ef", |       "url": "http://127.0.0.1:4333/api/ping", |       "method": "GET", |  
+- Network request/response capture: **PASS** — { |   "total": 1, |   "showing": 1, |   "hasMore": false, |   "requests": [ |     { |       "id": "46-97f8e104-e53f-4102-a25d-5676a2d3b554", |       "url": "http://127.0.0.1:4333/api/ping", |       "method": "GET", |  
 - Script evaluation: **PASS** — 1+1=2 title=BiDi Probe
 - Cookie get/set: **SKIP** — document.cookie round-trips via evaluate_script (probe=chocochip) but the server exposes no dedicated cookie tool
-- Screenshot: **PASS** — image image/png 40796 chars base64
+- Screenshot: **PASS** — image image/png 40972 chars base64
 - Dialog handling: **SKIP** — accept_dialog/dismiss_dialog exist but handling fails (Failed to accept/dismiss dialog); prompts auto-dismissed before the tool runs (confirm always dismissed, accept leg never confirmed); errs=[alert-accept: tool accept_dialog returned isError: Error: Failed to accept dialog: ; dismiss: tool dismiss_dialog returned isError: Error: Failed to dismiss dialog: ; accept: tool accept_dialog returned isError: Error: Failed to accept dialog: ]
 - Input / click: **PASS** — Hello, Ada via fill_by_uid + click_by_uid
 - Network interception: **SKIP** — no interception tool in the server tool list (list/get only; set_network_cache is cache control, not interception)
