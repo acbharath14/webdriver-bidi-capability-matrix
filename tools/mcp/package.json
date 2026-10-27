@@ -11,5 +11,8 @@
   "license": "ISC",
   "dependencies": {
     "@mozilla/firefox-devtools-mcp": "^0.10.6"
+  },
+  "allowScripts": {
+    "geckodriver@6.0.2": true
   }
 }
