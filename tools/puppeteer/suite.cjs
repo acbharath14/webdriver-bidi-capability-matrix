@@ -1,8 +1,10 @@
 // Puppeteer suite for the BiDi capability matrix (25.16.0, BiDi protocol).
 // Run from this directory: node suite.cjs
 // Env: PROBE_URL (default http://127.0.0.1:4333)
-// Output contract: one `RESULT <key> <PASS|FAIL|SKIP> [detail]` line per
-// capability, then a `SUMMARY <pass> <fail> <skip>` line. Exit 1 on any FAIL.
+// Output contract: one `RESULT <key> <PASS|FAIL|SKIP> [detail]` line and
+// one `TIMING <key> <ms>` line per capability, a `SESSION <k=v>...` line
+// with session facts, then a `SUMMARY <pass> <fail> <skip>` line.
+// Exit 1 on any FAIL.
 //
 // Notes:
 // - BiDi is opt-in for Chrome: launch({ protocol: 'webDriverBiDi' }).
@@ -19,9 +21,20 @@ const ARGS = [];
 if (typeof process.getuid === 'function' && process.getuid() === 0) ARGS.push('--no-sandbox');
 
 const results = [];
+// Per-capability timing: mark() returns the ms since the previous report
+// (or since the baseline reset after browser launch) and resets the clock,
+// so each capability's TIMING line covers its own work, not launch time.
+let lastMark = Date.now();
+function mark() {
+  const now = Date.now();
+  const ms = now - lastMark;
+  lastMark = now;
+  return ms;
+}
 function report(key, status, detail) {
   results.push({ key, status });
   console.log(`RESULT ${key} ${status}${detail ? ' ' + detail : ''}`);
+  console.log(`TIMING ${key} ${mark()}`);
 }
 function isUnsupported(e) {
   return /UnsupportedOperation|not supported/i.test(e.message || '');
@@ -46,7 +59,8 @@ async function pageText(page, selector) {
 const CAPABILITIES = [
   'navigation', 'console-log', 'js-error', 'network-capture',
   'script-eval', 'cookie', 'screenshot', 'dialog', 'input-click',
-  'network-intercept',
+  'network-intercept', 'drag-and-drop', 'hover', 'keyboard',
+  'multi-tab', 'iframe',
 ];
 
 (async () => {
@@ -58,6 +72,10 @@ const CAPABILITIES = [
     console.log(`SUMMARY 0 ${CAPABILITIES.length} 0`);
     process.exit(1);
   }
+  mark(); // baseline: capability 1 timing excludes browser launch
+  // Puppeteer 25 appends a build revision after /@; the table shows the
+  // release version only.
+  console.log('SESSION browser=' + (await browser.version()).split('/@')[0]);
 
   async function freshPage() {
     const page = await browser.newPage();
@@ -209,6 +227,98 @@ const CAPABILITIES = [
     } catch (e) {
       if (isUnsupported(e)) report('network-intercept', 'SKIP', 'BiDi does not cover interception: ' + e.message);
       else report('network-intercept', 'FAIL', e.message);
+    }
+
+    // 11. drag-and-drop: mouse drag from source to target center.
+    try {
+      const page = await freshPage();
+      const src = await page.$('#drag-source');
+      const dst = await page.$('#drop-zone');
+      const sb = await src.boundingBox();
+      const db = await dst.boundingBox();
+      await page.mouse.move(sb.x + sb.width / 2, sb.y + sb.height / 2);
+      await page.mouse.down();
+      await page.mouse.move(db.x + db.width / 2, db.y + db.height / 2, { steps: 10 });
+      await page.mouse.up();
+      const result = await waitUntil(async () => {
+        const t = await pageText(page, '#drag-result');
+        return t === 'dropped' ? t : null;
+      }, 10000, 'drag-result dropped');
+      report('drag-and-drop', 'PASS', `drag-result=${result}`);
+      await page.close();
+    } catch (e) {
+      if (isUnsupported(e)) report('drag-and-drop', 'SKIP', 'BiDi does not cover input drag: ' + e.message);
+      else report('drag-and-drop', 'FAIL', e.message);
+    }
+
+    // 12. hover: page.hover, assert mouseover handler ran.
+    try {
+      const page = await freshPage();
+      await page.hover('#hover-target');
+      const result = await waitUntil(async () => {
+        const t = await pageText(page, '#hover-result');
+        return t === 'hovered' ? t : null;
+      }, 10000, 'hover-result hovered');
+      report('hover', 'PASS', `hover-result=${result}`);
+      await page.close();
+    } catch (e) {
+      if (isUnsupported(e)) report('hover', 'SKIP', 'BiDi does not cover input hover: ' + e.message);
+      else report('hover', 'FAIL', e.message);
+    }
+
+    // 13. keyboard: focus the target, press ArrowRight, assert handler.
+    try {
+      const page = await freshPage();
+      await page.click('#key-target');
+      await page.keyboard.press('ArrowRight');
+      const result = await waitUntil(async () => {
+        const t = await pageText(page, '#key-result');
+        return t === 'arrow-right' ? t : null;
+      }, 10000, 'key-result arrow-right');
+      report('keyboard', 'PASS', `key-result=${result}`);
+      await page.close();
+    } catch (e) {
+      if (isUnsupported(e)) report('keyboard', 'SKIP', 'BiDi does not cover input keys: ' + e.message);
+      else report('keyboard', 'FAIL', e.message);
+    }
+
+    // 14. multi-tab: click the target=_blank link, capture the new
+    // target via targetcreated (precise: other pages sit idle), assert.
+    try {
+      const page = await freshPage();
+      const created = [];
+      const onCreated = (t) => created.push(t);
+      browser.on('targetcreated', onCreated);
+      await page.click('#link-newtab');
+      const target = await waitUntil(() => created.find(t => t.type() === 'page') || null, 10000, 'new tab target');
+      browser.off('targetcreated', onCreated);
+      const tab = await target.page();
+      await tab.waitForSelector('#second-title', { timeout: 10000 });
+      if (!tab.url().endsWith('/second')) throw new Error('tab url is ' + tab.url());
+      report('multi-tab', 'PASS', `tab landed ${tab.url()}`);
+      await tab.close();
+      await page.close();
+    } catch (e) {
+      if (isUnsupported(e)) report('multi-tab', 'SKIP', 'BiDi does not cover tab targets: ' + e.message);
+      else report('multi-tab', 'FAIL', e.message);
+    }
+
+    // 15. iframe: find the frame by URL, click inside, assert.
+    try {
+      const page = await freshPage();
+      await page.waitForSelector('#probe-frame', { timeout: 10000 });
+      const frame = page.frames().find(f => f.url().includes('/iframe-inner'));
+      if (!frame) throw new Error('frame /iframe-inner not found');
+      await frame.click('#inner-btn');
+      const result = await waitUntil(async () => {
+        const t = await frame.$eval('#inner-result', el => el.textContent);
+        return t === 'inner-clicked' ? t : null;
+      }, 10000, 'inner-result inner-clicked');
+      report('iframe', 'PASS', `inner-result=${result}`);
+      await page.close();
+    } catch (e) {
+      if (isUnsupported(e)) report('iframe', 'SKIP', 'BiDi does not cover frames: ' + e.message);
+      else report('iframe', 'FAIL', e.message);
     }
   } finally {
     await browser.close();

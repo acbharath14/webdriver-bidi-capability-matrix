@@ -77,3 +77,21 @@ committed). The suite uses it via `--firefox-path`; set `FIREFOX_PATH` to
 override. On a Mac, point `FIREFOX_PATH` at the system Firefox (or leave the
 bundled download in place). Firefox needs no `--no-sandbox` accommodation as
 root, unlike Chrome.
+
+## Piece 4 — input/context depth (11/0/4)
+
+- drag-and-drop PASS via drag_by_uid_to_uid (HTML5 drag events).
+- hover PASS via hover_by_uid.
+- keyboard PASS via press_key ArrowRight, focused on the target via
+  its snapshot uid.
+- multi-tab PASS via new_page + select_page + get_page_text +
+  close_page (new tab showed 'Second page'; returned to tab 0).
+- iframe SKIP: no frame tool exists in the server's 49-tool list;
+  the snapshot shows the iframe element but no tool can switch into
+  it or click inside, and evaluate_script is observation-only by the
+  matrix design rule.
+- Parser fix (same pass): the snapshot renders plain divs as
+  `uid=e24 div text="Drag me"` (no bare quoted label), which the old
+  `parseSnapshot` regex missed — it now also captures the `text=`
+  form. Button/input/link labels are unaffected (no collisions with
+  the added span/div texts).

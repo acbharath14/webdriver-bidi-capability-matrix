@@ -1,7 +1,8 @@
-// Wrapper: runs the Testplane CLI, then prints the shared RESULT/SUMMARY
-// contract from the JSON the test file wrote. Testplane's own exit code is
-// ignored — the matrix cares about per-capability results, and the test
-// never throws on a capability FAIL by design.
+// Wrapper: runs the Testplane CLI, then prints the shared
+// RESULT/SUMMARY/TIMING/SESSION contract from the JSON the test file wrote.
+// Testplane's own exit code is ignored — the matrix cares about
+// per-capability results, and the test never throws on a capability FAIL
+// by design.
 // Sandbox note: Testplane's own local grid fails here (its BiDi-isolation
 // step needs a CDP connection that never comes up — see NOTES.md), so the
 // wrapper starts the cached chromedriver on 9515 and points Testplane at it
@@ -44,9 +45,10 @@ try {
   console.error('TESTPLANE WRAPPER: no results file — testplane run failed (see output above)');
   process.exit(1);
 }
-console.log(`SESSION isBidi=${data.isBidi} webSocketUrl=${data.webSocketUrl}`);
+console.log(`SESSION isBidi=${data.isBidi} webSocketUrl=${data.webSocketUrl}${data.browserVersion ? ' browser=' + data.browserVersion : ''}`);
 for (const r of data.results) {
   console.log(`RESULT ${r.key} ${r.status}${r.detail ? ' ' + r.detail : ''}`);
+  if (typeof r.ms === 'number') console.log(`TIMING ${r.key} ${r.ms}`);
 }
 const p = data.results.filter(r => r.status === 'PASS').length;
 const f = data.results.filter(r => r.status === 'FAIL').length;

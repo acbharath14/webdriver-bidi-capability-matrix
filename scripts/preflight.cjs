@@ -15,11 +15,14 @@
 //    Vibium download Chrome themselves; Selenium Manager resolves its own
 //    driver). A missing one prints a WARNING with the exact fix command
 //    and the run continues — the affected tools report their own cells.
+//    On macOS, browsers are usually .app bundles, not PATH binaries, so
+//    the checks below also look in /Applications and ~/Applications.
 //
 // Exit 0 when setup is complete (or was completed by this run), 1 otherwise.
 
 const { spawnSync } = require('node:child_process');
 const fs = require('node:fs');
+const os = require('node:os');
 const path = require('node:path');
 
 const ROOT = path.join(__dirname, '..');
@@ -32,6 +35,13 @@ const TOOLS = [
   { name: 'testplane', dir: 'tools/testplane', check: (d) => fs.existsSync(path.join(d, 'node_modules', 'testplane', 'bin', 'testplane')) },
   { name: 'cypress', dir: 'tools/cypress', check: (d) => fs.existsSync(path.join(d, 'node_modules', '.bin', process.platform === 'win32' ? 'cypress.cmd' : 'cypress')) },
   { name: 'mcp', dir: 'tools/mcp', check: (d) => fs.existsSync(path.join(d, 'node_modules', '@mozilla', 'firefox-devtools-mcp', 'dist', 'index.js')) },
+  { name: 'wdio-mcp', dir: 'tools/wdio-mcp', check: (d) => fs.existsSync(path.join(d, 'node_modules', '.bin', process.platform === 'win32' ? 'wdio-mcp.cmd' : 'wdio-mcp')) },
+  { name: 'testplane-mcp', dir: 'tools/testplane-mcp', check: (d) => fs.existsSync(path.join(d, 'node_modules', '@testplane', 'mcp', 'build', 'cli.js')) },
+  { name: 'vibium-firefox', dir: 'tools/vibium-firefox', check: (d) => resolveOk('vibium/sync', d) },
+  { name: 'puppeteer-firefox', dir: 'tools/puppeteer-firefox', check: (d) => resolveOk('puppeteer', d) },
+  { name: 'selenium-firefox', dir: 'tools/selenium-firefox', check: (d) => resolveOk('selenium-webdriver', d) },
+  { name: 'webdriverio-firefox', dir: 'tools/webdriverio-firefox', check: (d) => resolveOk('webdriverio', d) },
+  { name: 'testplane-firefox', dir: 'tools/testplane-firefox', check: (d) => fs.existsSync(path.join(d, 'node_modules', 'testplane', 'bin', 'testplane')) },
 ];
 
 function resolveOk(request, dir) {
@@ -51,6 +61,15 @@ function commandExists(cmd) {
   } catch (e) {
     return false;
   }
+}
+
+// macOS .app bundle check: on a Mac, Chrome/Firefox live in
+// /Applications (or ~/Applications) and are invisible to `which`.
+// Returns false on non-macOS platforms, so other systems are unaffected.
+function macAppBundle(appName) {
+  if (process.platform !== 'darwin') return false;
+  return fs.existsSync(path.join('/Applications', appName))
+    || fs.existsSync(path.join(os.homedir(), 'Applications', appName));
 }
 
 function main() {
@@ -111,7 +130,8 @@ function main() {
   if (failed) return 1;
 
   // Browsers and drivers: warnings only, with the fix command.
-  const chromeOk = commandExists('google-chrome') || commandExists('chrome') || commandExists('chromium') || commandExists('chromium-browser');
+  const chromeOk = commandExists('google-chrome') || commandExists('chrome') || commandExists('chromium') || commandExists('chromium-browser')
+    || macAppBundle('Google Chrome.app') || macAppBundle('Chromium.app');
   if (!chromeOk) {
     console.log('PREFLIGHT WARNING: no system Chrome found. Puppeteer and Vibium download their own Chrome, and Selenium Manager resolves its own driver; WDIO/Testplane need CHROME_BIN or a system Chrome. (Not fatal — continuing.)');
   }
@@ -122,7 +142,8 @@ function main() {
   const firefoxOk = (process.env.FIREFOX_PATH && fs.existsSync(process.env.FIREFOX_PATH))
     || (process.env.CYPRESS_FIREFOX_PATH && fs.existsSync(process.env.CYPRESS_FIREFOX_PATH))
     || fs.existsSync(path.join(ROOT, 'tools', 'firefox', 'firefox', 'firefox'))
-    || commandExists('firefox');
+    || commandExists('firefox')
+    || macAppBundle('Firefox.app');
   if (!firefoxOk) {
     console.log('PREFLIGHT WARNING: no Firefox found (no FIREFOX_PATH, no CYPRESS_FIREFOX_PATH, no bundled tools/firefox/, none on PATH). Cypress and the MCP entry need one — install Firefox, or set FIREFOX_PATH to its binary. Those two tools will NOT-RUN without it. (Not fatal — continuing.)');
   }

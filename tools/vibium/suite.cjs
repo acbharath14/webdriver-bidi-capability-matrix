@@ -1,8 +1,10 @@
 // Vibium suite for the BiDi capability matrix (stable 26.8.21, JS sync client).
 // Run from this directory: node suite.cjs
 // Env: PROBE_URL (default http://127.0.0.1:4333)
-// Output contract: one `RESULT <key> <PASS|FAIL|SKIP> [detail]` line per
-// capability, then a `SUMMARY <pass> <fail> <skip>` line. Exit 1 on any FAIL.
+// Output contract: one `RESULT <key> <PASS|FAIL|SKIP> [detail]` line and
+// one `TIMING <key> <ms>` line per capability, a `SESSION <k=v>...` line
+// with session facts, then a `SUMMARY <pass> <fail> <skip>` line.
+// Exit 1 on any FAIL.
 //
 // Notes (observed, not assumed):
 // - Sandbox runs as root, so Chrome needs --no-sandbox; this is auto-set
@@ -23,9 +25,20 @@ if (!process.env.VIBIUM_CHROME_ARGS && typeof process.getuid === 'function' && p
 }
 
 const results = [];
+// Per-capability timing: mark() returns the ms since the previous report
+// (or since the baseline reset after browser start) and resets the clock,
+// so each capability's TIMING line covers its own work, not launch time.
+let lastMark = Date.now();
+function mark() {
+  const now = Date.now();
+  const ms = now - lastMark;
+  lastMark = now;
+  return ms;
+}
 function report(key, status, detail) {
   results.push({ key, status });
   console.log(`RESULT ${key} ${status}${detail ? ' ' + detail : ''}`);
+  console.log(`TIMING ${key} ${mark()}`);
 }
 function sleep(ms) {
   Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
@@ -52,7 +65,8 @@ function textOf(page, selector) {
 const CAPABILITIES = [
   'navigation', 'console-log', 'js-error', 'network-capture',
   'script-eval', 'cookie', 'screenshot', 'dialog', 'input-click',
-  'network-intercept',
+  'network-intercept', 'drag-and-drop', 'hover', 'keyboard',
+  'multi-tab', 'iframe',
 ];
 
 let bro = null;
@@ -64,6 +78,8 @@ try {
   console.log(`SUMMARY 0 ${f} 0`);
   process.exit(1);
 }
+mark(); // baseline: capability 1 timing excludes browser start
+console.log('SESSION browser=Vibium-managed-Chrome-for-Testing');
 
 function freshPage() {
   const page = bro.newPage();
@@ -212,6 +228,71 @@ try {
     if (!matchedPattern) throw new Error('neither route pattern intercepted /api/ping');
     report('network-intercept', 'PASS', `pattern=${matchedPattern} fetch-result=intercepted`);
   } catch (e) { report('network-intercept', 'FAIL', e.message); }
+
+  // 11. drag-and-drop: element dragTo, assert drop handler ran.
+  try {
+    const page = freshPage();
+    page.find('#drag-source').dragTo(page.find('#drop-zone'));
+    const result = waitUntil(page, () => {
+      const t = textOf(page, '#drag-result');
+      return t === 'dropped' ? t : null;
+    }, 10000, 'drag-result dropped');
+    report('drag-and-drop', 'PASS', `drag-result=${result}`);
+  } catch (e) { report('drag-and-drop', 'FAIL', e.message); }
+
+  // 12. hover: element hover, assert mouseover handler ran.
+  try {
+    const page = freshPage();
+    page.find('#hover-target').hover();
+    const result = waitUntil(page, () => {
+      const t = textOf(page, '#hover-result');
+      return t === 'hovered' ? t : null;
+    }, 10000, 'hover-result hovered');
+    report('hover', 'PASS', `hover-result=${result}`);
+  } catch (e) { report('hover', 'FAIL', e.message); }
+
+  // 13. keyboard: focus the target, press ArrowRight, assert key handler.
+  try {
+    const page = freshPage();
+    const target = page.find('#key-target');
+    target.click();
+    target.press('ArrowRight');
+    const result = waitUntil(page, () => {
+      const t = textOf(page, '#key-result');
+      return t === 'arrow-right' ? t : null;
+    }, 10000, 'key-result arrow-right');
+    report('keyboard', 'PASS', `key-result=${result}`);
+  } catch (e) { report('keyboard', 'FAIL', e.message); }
+
+  // 14. multi-tab: click the target=_blank link, find the new tab
+  // (page count grows; the newest page is the tab), assert it landed.
+  try {
+    const page = freshPage();
+    const before = bro.pages().length;
+    page.find('#link-newtab').click();
+    waitUntil(page, () => bro.pages().length > before, 10000, 'new tab page');
+    const tab = bro.pages()[bro.pages().length - 1];
+    if (!tab.url().endsWith('/second')) throw new Error('tab url is ' + tab.url());
+    const marker = waitUntil(tab, () => {
+      const t = textOf(tab, '#second-title');
+      return t === 'Second page' ? t : null;
+    }, 10000, 'second-title in new tab');
+    report('multi-tab', 'PASS', `tab landed ${tab.url()} marker=${marker}`);
+    try { tab.close(); } catch (_) { /* already closed */ }
+  } catch (e) { report('multi-tab', 'FAIL', e.message); }
+
+  // 15. iframe: switch into the frame by URL, click inside, assert.
+  try {
+    const page = freshPage();
+    const frame = page.frame('/iframe-inner');
+    if (!frame) throw new Error('frame /iframe-inner not found');
+    frame.find('#inner-btn').click();
+    const result = waitUntil(frame, () => {
+      const t = frame.find('#inner-result').text();
+      return t === 'inner-clicked' ? t : null;
+    }, 10000, 'inner-result inner-clicked');
+    report('iframe', 'PASS', `inner-result=${result}`);
+  } catch (e) { report('iframe', 'FAIL', e.message); }
 } finally {
   try { bro.stop(); } catch (_) { /* already stopped */ }
 }

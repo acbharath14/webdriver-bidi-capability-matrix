@@ -12,6 +12,8 @@
 //  - Element click/setValue and saveScreenshot have NO BiDi branch in v9:
 //    they use Classic endpoints. Those cells are SKIP (demonstrated via the
 //    Classic path so the SKIP is about transport, not capability).
+// Output contract: one RESULT line + one TIMING line per capability, a
+// SESSION line with session facts, then a SUMMARY line. Exit 1 on FAIL.
 // Requires a WebDriver server: run chromedriver on WDIO_PORT (default 9515)
 // and point CHROME_BIN at a Chrome binary when it is not on PATH.
 const { remote } = require('webdriverio');
@@ -24,9 +26,20 @@ const WDIO_PORT = Number(process.env.WDIO_PORT || 9515);
 const CHROME_BIN = process.env.CHROME_BIN || '';
 
 const results = [];
+// Per-capability timing: mark() returns the ms since the previous report
+// (or since the baseline reset after session start) and resets the clock,
+// so each capability's TIMING line covers its own work, not launch time.
+let lastMark = Date.now();
+function mark() {
+  const now = Date.now();
+  const ms = now - lastMark;
+  lastMark = now;
+  return ms;
+}
 function report(key, status, detail) {
   results.push({ key, status });
   console.log(`RESULT ${key} ${status}${detail ? ' ' + detail : ''}`);
+  console.log(`TIMING ${key} ${mark()}`);
 }
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 async function waitUntil(fn, timeoutMs, label) {
@@ -63,9 +76,11 @@ async function pageText(browser, selector) {
   try {
     const isBidi = browser.isBidi === true;
     const wsUrl = browser.capabilities && browser.capabilities.webSocketUrl;
-    console.log(`SESSION isBidi=${isBidi} webSocketUrl=${typeof wsUrl === 'string' ? 'present' : 'absent'}`);
+    const browserVersion = browser.capabilities && browser.capabilities.browserVersion;
+    mark(); // baseline: capability 1 timing excludes session start
+    console.log(`SESSION isBidi=${isBidi} webSocketUrl=${typeof wsUrl === 'string' ? 'present' : 'absent'}${browserVersion ? ' browser=' + browserVersion : ''}`);
     if (!isBidi) {
-      for (const key of ['navigation', 'console-log', 'js-error', 'network-capture', 'script-eval', 'cookie', 'screenshot', 'dialog', 'input-click', 'network-intercept']) {
+      for (const key of ['navigation', 'console-log', 'js-error', 'network-capture', 'script-eval', 'cookie', 'screenshot', 'dialog', 'input-click', 'network-intercept', 'drag-and-drop', 'hover', 'keyboard', 'multi-tab', 'iframe']) {
         report(key, 'SKIP', 'BiDi not connected (no webSocketUrl in session capabilities)');
       }
       console.log(`SUMMARY 0 0 ${results.filter(r => r.status === 'SKIP').length}`);
@@ -189,6 +204,77 @@ async function pageText(browser, selector) {
       // Ending the session below tears the intercept down with it.
       report('network-intercept', 'PASS', `fetch-result=${result} mock-calls=${calls}`);
     } catch (e) { report('network-intercept', 'FAIL', e.message); }
+
+    // 11. drag-and-drop: Classic dragAndDrop works, but WDIO v9 has no
+    // BiDi input.perform surface, so the BiDi cell is SKIP (same stance
+    // as screenshot / input-click in this suite).
+    try {
+      await browser.url(BASE + '/');
+      const src = await browser.$('#drag-source');
+      const dst = await browser.$('#drop-zone');
+      await src.dragAndDrop(dst);
+      const result = await waitUntil(async () => {
+        const t = await pageText(browser, '#drag-result');
+        return t === 'dropped' ? t : null;
+      }, 15000, 'drag-result dropped');
+      report('drag-and-drop', 'SKIP', `Classic dragAndDrop works (${result}) but WDIO v9 exposes no BiDi input.perform surface`);
+    } catch (e) { report('drag-and-drop', 'FAIL', e.message); }
+
+    // 12. hover: Classic moveTo works; no BiDi input.perform surface.
+    try {
+      await browser.url(BASE + '/');
+      await browser.$('#hover-target').moveTo();
+      const result = await waitUntil(async () => {
+        const t = await pageText(browser, '#hover-result');
+        return t === 'hovered' ? t : null;
+      }, 15000, 'hover-result hovered');
+      report('hover', 'SKIP', `Classic moveTo works (${result}) but WDIO v9 exposes no BiDi input.perform surface`);
+    } catch (e) { report('hover', 'FAIL', e.message); }
+
+    // 13. keyboard: Classic keys() works; no BiDi input.perform surface.
+    try {
+      await browser.url(BASE + '/');
+      await browser.$('#key-target').click();
+      await browser.keys('ArrowRight');
+      const result = await waitUntil(async () => {
+        const t = await pageText(browser, '#key-result');
+        return t === 'arrow-right' ? t : null;
+      }, 15000, 'key-result arrow-right');
+      report('keyboard', 'SKIP', `Classic keys() works (${result}) but WDIO v9 exposes no BiDi input.perform surface`);
+    } catch (e) { report('keyboard', 'FAIL', e.message); }
+
+    // 14. multi-tab: Classic window handles work; WDIO v9 exposes no
+    // BiDi browsingContext creation/switching surface.
+    try {
+      await browser.url(BASE + '/');
+      const orig = await browser.getWindowHandle();
+      await browser.$('#link-newtab').click();
+      const handles = await waitUntil(async () => {
+        const hs = await browser.getWindowHandles();
+        return hs.length > 1 ? hs : null;
+      }, 15000, 'second window handle');
+      const tab = handles.find(h => h !== orig);
+      await browser.switchWindow(tab);
+      const url = await browser.getUrl();
+      if (!url.endsWith('/second')) throw new Error('tab url is ' + url);
+      await browser.closeWindow();
+      await browser.switchWindow(orig);
+      report('multi-tab', 'SKIP', `Classic window handles work (tab landed ${url}) but WDIO v9 exposes no BiDi browsingContext surface`);
+    } catch (e) { report('multi-tab', 'FAIL', e.message); }
+
+    // 15. iframe: Classic switchFrame works; no BiDi frame surface in v9.
+    try {
+      await browser.url(BASE + '/');
+      const frameEl = await browser.$('#probe-frame');
+      await browser.switchFrame(frameEl);
+      await browser.$('#inner-btn').click();
+      const result = await waitUntil(async () => {
+        const t = await pageText(browser, '#inner-result');
+        return t === 'inner-clicked' ? t : null;
+      }, 15000, 'inner-result inner-clicked');
+      await browser.switchFrame(null);
+      report('iframe', 'SKIP', `Classic switchFrame works (${result}) but WDIO v9 exposes no BiDi frame surface`);
+    } catch (e) { report('iframe', 'FAIL', e.message); }
 
     const p = results.filter(r => r.status === 'PASS').length;
     const f = results.filter(r => r.status === 'FAIL').length;

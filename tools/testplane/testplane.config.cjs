@@ -9,10 +9,11 @@ const isRoot = typeof process.getuid === 'function' && process.getuid() === 0;
 
 module.exports = {
   baseUrl: process.env.PROBE_URL || 'http://127.0.0.1:4333',
-  // gridUrl: null (default) = Testplane's own local grid. In the sandbox
-  // the local grid's CDP connection fails (see tools/testplane/NOTES.md),
-  // so the runner sets TESTPLANE_GRID_URL to a chromedriver it starts.
-  gridUrl: process.env.TESTPLANE_GRID_URL || null,
+  // gridUrl is omitted entirely when TESTPLANE_GRID_URL is unset, so
+  // Testplane uses its own local grid. (The runner deletes
+  // TESTPLANE_GRID_URL before launching, so the key is absent in
+  // sandbox runs; on a Mac it is absent unless explicitly set.)
+  ...(process.env.TESTPLANE_GRID_URL ? { gridUrl: process.env.TESTPLANE_GRID_URL } : {}),
   browsers: {
     chrome: {
       headless: true,

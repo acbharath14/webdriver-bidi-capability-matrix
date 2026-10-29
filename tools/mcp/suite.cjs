@@ -5,8 +5,10 @@
 // here, so results are deterministic.
 // Env: PROBE_URL (default http://127.0.0.1:4333), FIREFOX_PATH (default:
 // the Firefox downloaded under ../firefox).
-// Output contract: one `RESULT <key> <PASS|FAIL|SKIP> [detail]` line per
-// capability, then a `SUMMARY <pass> <fail> <skip>` line. Exit 1 on any FAIL.
+// Output contract: one `RESULT <key> <PASS|FAIL|SKIP> [detail]` line and
+// one `TIMING <key> <ms>` line per capability, a `SESSION <k=v>...` line
+// with session facts, then a `SUMMARY <pass> <fail> <skip>` line.
+// Exit 1 on any FAIL.
 // Tool inventory (verified via tools/list, developer preset, 49 tools):
 // navigation -> navigate_page; console -> list_console_messages;
 // js-error -> list_console_messages; network-capture -> list_network_requests;
@@ -14,6 +16,10 @@
 // dialog -> accept_dialog / dismiss_dialog; input-click -> take_snapshot +
 // fill_by_uid + click_by_uid. NO cookie tool and NO interception tool exist
 // in the server's tool list — those two cells are SKIP (see below).
+// Piece 4: drag-and-drop -> drag_by_uid_to_uid; hover -> hover_by_uid;
+// keyboard -> press_key (ArrowRight, focused via uid); multi-tab ->
+// new_page + select_page + list_pages + close_page. NO frame tool exists
+// in the server's tool list — the iframe cell is SKIP (see below).
 const { spawn } = require('node:child_process');
 const os = require('node:os');
 const path = require('node:path');
@@ -23,11 +29,22 @@ const SERVER = path.join(__dirname, 'node_modules', '@mozilla', 'firefox-devtool
 const FIREFOX = process.env.FIREFOX_PATH || path.join(__dirname, '..', 'firefox', 'firefox', 'firefox');
 
 const results = [];
+// Per-capability timing: mark() returns the ms since the previous report
+// (or since the baseline reset after session start) and resets the clock,
+// so each capability's TIMING line covers its own work, not launch time.
+let lastMark = Date.now();
+function mark() {
+  const now = Date.now();
+  const ms = now - lastMark;
+  lastMark = now;
+  return ms;
+}
 function report(key, status, detail) {
   results.push({ key, status });
   // Single-line details: the RESULT contract is one line per capability.
   const clean = String(detail || '').replace(/\s*\n\s*/g, ' | ');
   console.log(`RESULT ${key} ${status}${clean ? ' ' + clean : ''}`);
+  console.log(`TIMING ${key} ${mark()}`);
 }
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 async function waitUntil(fn, timeoutMs, label) {
@@ -97,11 +114,16 @@ function textOf(res) {
     return `[${c.type}]`;
   }).join('\n');
 }
-// Snapshot lines look like: `  uid=e1 button "Log" text="Log"`.
+// Snapshot lines look like: `  uid=e1 button "Log" text="Log"` for
+// buttons/inputs/links, but plain divs render as `  uid=e24 div
+// text="Drag me"` (no bare quoted label, only text=). Both forms are
+// captured: the label is the bare quoted string when present, else the
+// text= value. (Without the text= branch, the Piece 4 div targets were
+// invisible to uid lookups even though the snapshot lists them.)
 function parseSnapshot(text) {
   const map = new Map();
   for (const line of text.split('\n')) {
-    const m = line.match(/uid=([A-Za-z0-9_-]+)\s+\S+\s+"([^"]*)"/);
+    const m = line.match(/uid=([A-Za-z0-9_-]+)\s+\S+\s+(?:text=)?"([^"]*)"/);
     if (m) map.set(m[2], m[1]);
   }
   return map;
@@ -146,6 +168,7 @@ function unwrapEval(text) {
     const tools = await mcp.call('tools/list', {});
     const names = new Set(tools.tools.map(t => t.name));
     console.log(`SESSION mcp-server=0.10.6 tools=${tools.tools.length} has-cookie-tool=${names.has('get_cookies') || names.has('cookies')} has-intercept-tool=${names.has('intercept_request')}`);
+    mark(); // baseline: capability 1 timing excludes session start
 
     async function goHome() {
       await mcp.tool('navigate_page', { url: BASE + '/' });
@@ -293,6 +316,80 @@ function unwrapEval(text) {
       if (hasIntercept) throw new Error('unexpected intercept tool present; suite assumption wrong');
       report('network-intercept', 'SKIP', 'no interception tool in the server tool list (list/get only; set_network_cache is cache control, not interception)');
     } catch (e) { report('network-intercept', 'FAIL', e.message); }
+
+    // Snapshot-label lookup with a diagnostic miss (lists available labels).
+    function uidFor(map, label) {
+      const uid = map.get(label);
+      if (!uid) throw new Error('no snapshot uid for label ' + JSON.stringify(label) + '; labels=[' + [...map.keys()].join(' | ') + ']');
+      return uid;
+    }
+    async function readResult(selector) {
+      return unwrapEval(await evalText('() => document.querySelector(' + JSON.stringify(selector) + ') ? document.querySelector(' + JSON.stringify(selector) + ').textContent : null'));
+    }
+
+    // 11. drag-and-drop: drag_by_uid_to_uid (HTML5 drag events).
+    try {
+      await goHome();
+      const map = await snapshotMap();
+      await mcp.tool('drag_by_uid_to_uid', { fromUid: uidFor(map, 'Drag me'), toUid: uidFor(map, 'Drop here') });
+      const result = await waitUntil(async () => {
+        const t = await readResult('#drag-result');
+        return t === 'dropped' ? t : null;
+      }, 30000, 'drag-result dropped');
+      report('drag-and-drop', 'PASS', `drag-result=${result} via drag_by_uid_to_uid`);
+    } catch (e) { report('drag-and-drop', 'FAIL', e.message); }
+
+    // 12. hover: hover_by_uid.
+    try {
+      await goHome();
+      const map = await snapshotMap();
+      await mcp.tool('hover_by_uid', { uid: uidFor(map, 'Hover me') });
+      const result = await waitUntil(async () => {
+        const t = await readResult('#hover-result');
+        return t === 'hovered' ? t : null;
+      }, 30000, 'hover-result hovered');
+      report('hover', 'PASS', `hover-result=${result} via hover_by_uid`);
+    } catch (e) { report('hover', 'FAIL', e.message); }
+
+    // 13. keyboard: press_key ArrowRight, focused on the target via uid.
+    try {
+      await goHome();
+      const map = await snapshotMap();
+      await mcp.tool('press_key', { key: 'ArrowRight', uid: uidFor(map, 'Focus and press ArrowRight') });
+      const result = await waitUntil(async () => {
+        const t = await readResult('#key-result');
+        return t === 'arrow-right' ? t : null;
+      }, 30000, 'key-result arrow-right');
+      report('keyboard', 'PASS', `key-result=${result} via press_key ArrowRight`);
+    } catch (e) { report('keyboard', 'FAIL', e.message); }
+
+    // 14. multi-tab: new_page + select_page + get_page_text + close_page.
+    try {
+      await goHome();
+      const opened = textOf(await mcp.tool('new_page', { url: BASE + '/second' }));
+      const m = opened.match(/(\d+)/);
+      if (!m) throw new Error('new_page did not return a tab index: ' + opened.slice(0, 200));
+      const tabIdx = parseInt(m[1], 10);
+      await mcp.tool('select_page', { pageIdx: tabIdx });
+      const text = await waitUntil(async () => {
+        const t = textOf(await mcp.tool('get_page_text', {}));
+        return t.includes('Second page') ? t : null;
+      }, 30000, 'Second page text in new tab');
+      await mcp.tool('close_page', { pageIdx: tabIdx });
+      await mcp.tool('select_page', { pageIdx: 0 });
+      const back = textOf(await mcp.tool('get_page_text', {}));
+      if (!back.includes('BiDi Probe')) throw new Error('did not return to probe tab; text starts: ' + back.slice(0, 120));
+      report('multi-tab', 'PASS', `new tab ${tabIdx} showed Second page; returned to probe tab`);
+    } catch (e) { report('multi-tab', 'FAIL', e.message); }
+
+    // 15. iframe: no frame tool -> SKIP (same assumption-check pattern as
+    // network-intercept: if a frame tool ever appears, that is a FAIL
+    // telling the suite its assumption is stale, not a silent PASS).
+    try {
+      const hasFrame = ['switch_frame', 'select_frame', 'enter_frame', 'frame', 'attach_frame', 'list_frames'].some(n => names.has(n));
+      if (hasFrame) throw new Error('unexpected frame tool present; suite assumption wrong');
+      report('iframe', 'SKIP', 'no frame tool in the server tool list (49 tools); snapshot shows the iframe element but no tool can switch into it or click inside; evaluate_script is observation-only by the matrix design rule');
+    } catch (e) { report('iframe', 'FAIL', e.message); }
 
     const p = results.filter(r => r.status === 'PASS').length;
     const f = results.filter(r => r.status === 'FAIL').length;

@@ -23,3 +23,11 @@ manages Chrome for Testing itself (cached at `~/.cache/vibium/`).
 
 10/10 PASS in the sandbox run, including network interception via
 `route('**/api/ping', ...)` and dialog accept + dismiss on fresh pages.
+
+## Piece 4 — input/context depth (15/0/0)
+
+All five new capabilities pass via Vibium's own API: drag-and-drop
+(`dragTo`), hover (`hover`), keyboard (element `press('ArrowRight')`
+after click-to-focus), multi-tab (click the `target=_blank` link, find
+the new page by page-count growth, assert it landed), iframe
+(`frame('/iframe-inner')`, click inside, assert). No gaps found.

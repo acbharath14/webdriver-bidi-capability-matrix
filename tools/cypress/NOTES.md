@@ -67,3 +67,18 @@ CYPRESS_INSTALL_BINARY=./cypress.zip npx cypress install
 - `supportFile: false`, `video: false`, `screenshotOnRunFailure: false`
   keep runs quiet; `testIsolation` is left at its default (each test gets a
   fresh page, so each test visits first).
+
+## Piece 4 — input/context depth (8/0/7)
+
+- drag-and-drop SKIP: trigger dragstart/dragover/drop works
+  (drag-result=dropped) but Cypress has no native drag or BiDi input
+  API; synthetic events only (same precedent as network-intercept).
+- hover SKIP: trigger mouseover works (hovered) but is synthetic, not
+  BiDi input; no real hover API.
+- keyboard SKIP: cy.type() only targets inputs/textareas/
+  contenteditables, so it cannot send ArrowRight to the focusable
+  div; trigger keydown works (arrow-right) but is synthetic.
+- multi-tab SKIP: Cypress is single-tab by architecture; it cannot
+  open, switch to, or assert a new tab.
+- iframe PASS: same-origin iframe content via `contentDocument`,
+  the standard Cypress iframe pattern; click inside asserts.

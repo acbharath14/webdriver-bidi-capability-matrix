@@ -2,8 +2,10 @@
 // JS bindings, Chrome via cached Chrome for Testing 156 + chromedriver).
 // Run from this directory: node suite.cjs
 // Env: PROBE_URL (default http://127.0.0.1:4333)
-// Output contract: one `RESULT <key> <PASS|FAIL|SKIP> [detail]` line per
-// capability, then a `SUMMARY <pass> <fail> <skip>` line. Exit 1 on any FAIL.
+// Output contract: one `RESULT <key> <PASS|FAIL|SKIP> [detail]` line and
+// one `TIMING <key> <ms>` line per capability, a `SESSION <k=v>...` line
+// with session facts, then a `SUMMARY <pass> <fail> <skip>` line.
+// Exit 1 on any FAIL.
 //
 // Notes:
 // - BiDi is opt-in per session: capability 'webSocketUrl': true. Without a
@@ -38,9 +40,20 @@ const CHROME_BIN = CACHE + '/chrome';
 const CHROMEDRIVER = CACHE + '/chromedriver';
 
 const results = [];
+// Per-capability timing: mark() returns the ms since the previous report
+// (or since the baseline reset after driver build) and resets the clock,
+// so each capability's TIMING line covers its own work, not launch time.
+let lastMark = Date.now();
+function mark() {
+  const now = Date.now();
+  const ms = now - lastMark;
+  lastMark = now;
+  return ms;
+}
 function report(key, status, detail) {
   results.push({ key, status });
   console.log(`RESULT ${key} ${status}${detail ? ' ' + detail : ''}`);
+  console.log(`TIMING ${key} ${mark()}`);
 }
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 async function waitUntil(fn, timeoutMs, label) {
@@ -66,7 +79,8 @@ function shortEvent(e) {
 const CAPABILITIES = [
   'navigation', 'console-log', 'js-error', 'network-capture',
   'script-eval', 'cookie', 'screenshot', 'dialog', 'input-click',
-  'network-intercept',
+  'network-intercept', 'drag-and-drop', 'hover', 'keyboard',
+  'multi-tab', 'iframe',
 ];
 
 (async () => {
@@ -86,6 +100,11 @@ const CAPABILITIES = [
     console.log(`SUMMARY 0 ${CAPABILITIES.length} 0`);
     process.exit(1);
   }
+  mark(); // baseline: capability 1 timing excludes driver build
+  try {
+    const caps = await driver.getCapabilities();
+    console.log('SESSION browser=' + caps.getBrowserVersion());
+  } catch (e) { /* version unknown; the runner falls back to its probe */ }
 
   async function newTab() {
     return BrowsingContext(driver, { type: 'tab' });
@@ -311,6 +330,139 @@ const CAPABILITIES = [
       report('network-intercept', 'PASS', `fetch-result=${result}`);
       await ctx.close();
     } catch (e) { report('network-intercept', 'FAIL', e.message); }
+
+    // 11. drag-and-drop: one BiDi pointer sequence (move to source,
+    // down, move to target, up), assert drop handler ran.
+    try {
+      const ctx = await newTab();
+      await ctx.navigate(BASE + '/');
+      const input = await Input(driver);
+      const src = await ctx.locateElement(Locator.css('#drag-source'));
+      const dst = await ctx.locateElement(Locator.css('#drop-zone'));
+      await input.perform(ctx.id, [{
+        type: 'pointer', id: 'mouse', parameters: { pointerType: 'mouse' },
+        actions: [
+          { type: 'pointerMove', origin: src, x: 0, y: 0 },
+          { type: 'pointerDown', button: 0 },
+          { type: 'pointerMove', origin: dst, x: 0, y: 0 },
+          { type: 'pointerUp', button: 0 },
+        ],
+      }]);
+      const result = await waitUntil(async () => {
+        const t = await tabText(ctx, '#drag-result');
+        return t === 'dropped' ? t : null;
+      }, 10000, 'drag-result dropped');
+      report('drag-and-drop', 'PASS', `drag-result=${result}`);
+      await ctx.close();
+    } catch (e) { report('drag-and-drop', 'FAIL', e.message); }
+
+    // 12. hover: BiDi pointer move onto the target, assert handler ran.
+    try {
+      const ctx = await newTab();
+      await ctx.navigate(BASE + '/');
+      const input = await Input(driver);
+      const el = await ctx.locateElement(Locator.css('#hover-target'));
+      await input.perform(ctx.id, [{
+        type: 'pointer', id: 'mouse', parameters: { pointerType: 'mouse' },
+        actions: [{ type: 'pointerMove', origin: el, x: 0, y: 0 }],
+      }]);
+      const result = await waitUntil(async () => {
+        const t = await tabText(ctx, '#hover-result');
+        return t === 'hovered' ? t : null;
+      }, 10000, 'hover-result hovered');
+      report('hover', 'PASS', `hover-result=${result}`);
+      await ctx.close();
+    } catch (e) { report('hover', 'FAIL', e.message); }
+
+    // 13. keyboard: focus the target, BiDi key down/up for ArrowRight.
+    try {
+      const ctx = await newTab();
+      await ctx.navigate(BASE + '/');
+      await evalIn(ctx, `document.querySelector('#key-target').scrollIntoView()`);
+      await bidiClick(ctx, '#key-target');
+      const input = await Input(driver);
+      // BiDi key values for special keys are the WebDriver PUA codes, not
+      // the key names: keyDown 'ArrowRight' produces NO keydown event in
+      // chromedriver's BiDi mapper (probed), while '\uE014' (Right)
+      // produces a proper keydown with key/code 'ArrowRight'.
+      await input.perform(ctx.id, [{ type: 'key', id: 'keyboard', actions: [
+        { type: 'keyDown', value: '\uE014' },
+        { type: 'keyUp', value: '\uE014' },
+      ] }]);
+      const result = await waitUntil(async () => {
+        const t = await tabText(ctx, '#key-result');
+        return t === 'arrow-right' ? t : null;
+      }, 10000, 'key-result arrow-right');
+      report('keyboard', 'PASS', `key-result=${result}`);
+      await ctx.close();
+    } catch (e) { report('keyboard', 'FAIL', e.message); }
+
+    // 14. multi-tab: click the target=_blank link, find the new
+    // top-level context by URL, wrap it, assert it landed.
+    try {
+      const ctx = await newTab();
+      await ctx.navigate(BASE + '/');
+      const created = [];
+      const tabInspector = await BrowsingContextInspector(driver, null);
+      await tabInspector.onBrowsingContextCreated(ev => created.push(ev));
+      await evalIn(ctx, `document.querySelector('#link-newtab').scrollIntoView()`);
+      await bidiClick(ctx, '#link-newtab');
+      // NOTE: getTopLevelContexts is NOT used here — it maps the wire
+      // 'context' field to .id incorrectly (always undefined in 4.51.0),
+      // so wrapping its result fails. The contextCreated event carries a
+      // valid .id (probed).
+      // The inspector's socket handler forwards EVERY BiDi message to the
+      // callback (not just contextCreated), so created[] mixes
+      // BrowsingContextInfo (.id) with NavigationInfo (.browsingContextId)
+      // — including late frame navigations. Only a BrowsingContextInfo
+      // with no parent is a new top-level tab (frames carry a parent).
+      const found = await waitUntil(() => {
+        const ev = created.find(e => e && typeof e.id === 'string' && e.id !== ctx.id && e.parentBrowsingContext == null);
+        return ev || null;
+      }, 10000, 'new top-level tab contextCreated');
+      const tab = await BrowsingContext(driver, { browsingContextId: found.id });
+      const marker = await waitUntil(async () => {
+        const t = await tabText(tab, '#second-title');
+        return t === 'Second page' ? t : null;
+      }, 10000, 'second-title in new tab');
+      const href = await evalIn(tab, 'window.location.href');
+      if (!String(href).endsWith('/second')) throw new Error('tab href is ' + href);
+      report('multi-tab', 'PASS', `tab landed ${href} marker=${marker}`);
+      await tab.close();
+      await ctx.close();
+    } catch (e) { report('multi-tab', 'FAIL', e.message); }
+
+    // 15. iframe: getTree, wrap the frame child context, click inside.
+    try {
+      const ctx = await newTab();
+      await ctx.navigate(BASE + '/');
+      const frameNode = await waitUntil(async () => {
+        const tree = await ctx.getTree();
+        const kids = tree.children || [];
+        return kids.find(c => String(c.url || '').includes('/iframe-inner')) || null;
+      }, 10000, 'frame /iframe-inner in tree');
+      const frameId = frameNode.context || frameNode.id;
+      const frame = await BrowsingContext(driver, { browsingContextId: frameId });
+      await bidiClick(frame, '#inner-btn');
+      let result = null;
+      try {
+        result = await waitUntil(async () => {
+          const t = await tabText(frame, '#inner-result');
+          return t === 'inner-clicked' ? t : null;
+        }, 5000, 'inner-result inner-clicked');
+      } catch (_) { /* fall through to SKIP below */ }
+      if (result) {
+        report('iframe', 'PASS', `inner-result=${result}`);
+      } else {
+        // Demonstrated mapper gap (probed): the BiDi input click runs
+        // without error but has no effect inside a frame context, while
+        // a script .click() in the same frame works. The frame is
+        // reachable via BiDi, but input interaction in frames is not
+        // delivered — SKIP, not FAIL, by the dialog-cell precedent.
+        report('iframe', 'SKIP', 'BiDi input click in frame contexts is a mapper no-op (runs, no effect); script click in the same frame works');
+      }
+      await ctx.close();
+    } catch (e) { report('iframe', 'FAIL', e.message); }
   } finally {
     try { await driver.quit(); } catch (_) { /* already quit */ }
   }

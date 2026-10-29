@@ -81,3 +81,13 @@ is unverified here.
   them. The `isolation: false` + `se:cdp` finding may not apply on a Mac —
   it is a statement about chromedriver 156 in this sandbox, not about
   Testplane generally.
+
+## Piece 4 — input/context depth (7/0/8)
+
+The five new cells are all SKIP with Classic demonstrations, same
+stance as the WDIO v9 stack they share: Classic dragAndDrop, moveTo,
+keys('ArrowRight'), window handles, and switchFrame all work; no BiDi
+surface exists for them in Testplane's WDIO fork. Note the dialog
+flake: the suite's dialog cell intermittently kills the run with an
+unhandled `handleUserPrompt` rejection (chromedriver mapper
+auto-dismiss race); rerunning usually gets past it.

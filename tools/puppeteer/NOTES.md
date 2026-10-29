@@ -24,3 +24,11 @@ stable BiDi does not cover it.
 
 10/10 PASS in the sandbox run, including network interception
 (`setRequestInterception` + `respond`) and dialog handling.
+
+## Piece 4 — input/context depth (15/0/0)
+
+All five new capabilities pass over BiDi: drag-and-drop (mouse
+move/down/move/up across element centers), hover (`page.hover`),
+keyboard (click-to-focus + `keyboard.press('ArrowRight')`), multi-tab
+(`targetcreated` capture for the new tab, assert it landed), iframe
+(`page.frames()` by URL, click inside, assert). No gaps found.

@@ -66,3 +66,30 @@ through the same chromedriver, so this is specific to Selenium's mapper path.
 - Selenium Manager downloads are not needed in the sandbox (cached driver +
   binary are used); on a Mac, Selenium Manager resolves Chrome/chromedriver
   automatically.
+
+## Piece 4 — input/context depth (13/0/2)
+
+- drag-and-drop PASS: one BiDi pointer sequence (move to source, down,
+  move to target, up).
+- hover PASS: BiDi pointer move onto the target.
+- keyboard PASS: click-to-focus + BiDi key down/up. Special keys use
+  the WebDriver PUA codes, not key names: keyDown 'ArrowRight'
+  produces NO keydown event in the driver's BiDi mapper (probed),
+  while '\uE014' (Right) produces a proper keydown with
+  key/code 'ArrowRight'.
+- multi-tab PASS: click the `target=_blank` link, take the new
+  top-level tab from the `contextCreated` event stream. Two binding
+  gotchas, both probed: (1) the inspector's socket handler forwards
+  EVERY BiDi message to the callback, so the stream mixes
+  BrowsingContextInfo (.id) with NavigationInfo (.browsingContextId)
+  — filter to BrowsingContextInfo with no parent (frames carry a
+  parent; late frame navigations otherwise hijack the pick). (2)
+  `getTopLevelContexts()` maps the wire 'context' field to .id
+  incorrectly (always undefined in 4.51.0), so it cannot be used to
+  wrap the new tab — the event path is the working one.
+- iframe SKIP (demonstrated mapper gap): the frame child is reachable
+  via `getTree` + wrapping its context id, and a script `.click()`
+  inside the frame works — but a BiDi input click in a frame context
+  runs without error and has no effect. By the dialog-cell precedent
+  (mapper-level unusability), that is SKIP, not FAIL; the cell
+  passes automatically if a mapper ever delivers frame input.

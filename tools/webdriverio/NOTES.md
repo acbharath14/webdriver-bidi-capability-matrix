@@ -64,3 +64,12 @@ is about transport, not capability):
 - Chromedriver is started externally here (the cached binary). On a Mac,
   point `WDIO_PORT` at any running chromedriver/selenium server, or adapt the
   runner to start one; `CHROME_BIN` is unnecessary with a system Chrome.
+
+## Piece 4 — input/context depth (8/0/7)
+
+The five new cells are all SKIP with Classic demonstrations, same
+stance as screenshot / input-click: WDIO v9 exposes no BiDi surface
+for them. Classic dragAndDrop, moveTo, keys('ArrowRight'), window
+handles (new tab via link click + switchWindow + closeWindow), and
+switchFrame all work and are demonstrated in the detail strings; the
+SKIPs are about BiDi transport, not capability.

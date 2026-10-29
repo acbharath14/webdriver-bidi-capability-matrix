@@ -1,4 +1,4 @@
-// Testplane suite — one `it` running all 10 capabilities in one browser
+// Testplane suite — one `it` running all 15 capabilities in one browser
 // session, mirroring the other tools' suites. Testplane's browser object is
 // its @testplane/webdriverio fork, so the WDIO-style BiDi surfaces apply:
 // sessionSubscribe + browser.on(...) for events, execute() for script,
@@ -7,8 +7,9 @@
 // no BiDi branch (same as upstream WDIO v9) — those cells are SKIP,
 // demonstrated via the Classic path.
 // Results are written to TESTPLANE_RESULTS (JSON) so the wrapper can print
-// RESULT/SUMMARY lines in the shared contract; the test itself never throws
-// on a capability FAIL (the wrapper owns the exit code).
+// RESULT/SUMMARY/TIMING lines in the shared contract (each result carries
+// its ms; meta carries session facts like browserVersion); the test itself
+// never throws on a capability FAIL (the wrapper owns the exit code).
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
@@ -18,11 +19,21 @@ const OUT = process.env.TESTPLANE_RESULTS || path.join(__dirname, '..', 'results
 
 const results = [];
 let meta = {};
+// Per-capability timing: mark() returns the ms since the previous report
+// (or since the baseline reset at the start of the test) and resets the
+// clock, so each result's ms covers its own work, not session start.
+let lastMark = Date.now();
+function mark() {
+  const now = Date.now();
+  const ms = now - lastMark;
+  lastMark = now;
+  return ms;
+}
 function flush() {
   fs.writeFileSync(OUT, JSON.stringify({ ...meta, results }, null, 2));
 }
 function report(key, status, detail) {
-  results.push({ key, status, detail: detail || '' });
+  results.push({ key, status, detail: detail || '', ms: mark() });
   flush(); // incremental: a mid-run failure still leaves partial results
 }
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
@@ -47,9 +58,10 @@ describe('bidi capability matrix', () => {
   it('all capabilities', async ({ browser }) => {
     const isBidi = browser.isBidi === true;
     const wsUrl = browser.capabilities && browser.capabilities.webSocketUrl;
-    meta = { isBidi, webSocketUrl: typeof wsUrl };
+    meta = { isBidi, webSocketUrl: typeof wsUrl, browserVersion: browser.capabilities && browser.capabilities.browserVersion };
     flush();
-    const keys = ['navigation', 'console-log', 'js-error', 'network-capture', 'script-eval', 'cookie', 'screenshot', 'dialog', 'input-click', 'network-intercept'];
+    mark(); // baseline: capability 1 timing excludes session start
+    const keys = ['navigation', 'console-log', 'js-error', 'network-capture', 'script-eval', 'cookie', 'screenshot', 'dialog', 'input-click', 'network-intercept', 'drag-and-drop', 'hover', 'keyboard', 'multi-tab', 'iframe'];
     if (!isBidi) {
       for (const key of keys) report(key, 'SKIP', 'BiDi not connected (no webSocketUrl in session capabilities)');
       return;
@@ -188,5 +200,76 @@ describe('bidi capability matrix', () => {
       const calls = mock.calls.length;
       report('network-intercept', 'PASS', `fetch-result=${result} mock-calls=${calls}`);
     } catch (e) { report('network-intercept', 'FAIL', e.message); }
+
+    // 11. drag-and-drop: Classic dragAndDrop works; no BiDi
+    // input.perform surface in the WDIO v9 stack (as screenshot /
+    // input-click in this suite).
+    try {
+      await browser.url(BASE + '/');
+      const src = await browser.$('#drag-source');
+      const dst = await browser.$('#drop-zone');
+      await src.dragAndDrop(dst);
+      const result = await waitUntil(async () => {
+        const t = await pageText(browser, '#drag-result');
+        return t === 'dropped' ? t : null;
+      }, 15000, 'drag-result dropped');
+      report('drag-and-drop', 'SKIP', `Classic dragAndDrop works (${result}) but Testplane/WDIO expose no BiDi input.perform surface`);
+    } catch (e) { report('drag-and-drop', 'FAIL', e.message); }
+
+    // 12. hover: Classic moveTo works; no BiDi input.perform surface.
+    try {
+      await browser.url(BASE + '/');
+      await browser.$('#hover-target').moveTo();
+      const result = await waitUntil(async () => {
+        const t = await pageText(browser, '#hover-result');
+        return t === 'hovered' ? t : null;
+      }, 15000, 'hover-result hovered');
+      report('hover', 'SKIP', `Classic moveTo works (${result}) but Testplane/WDIO expose no BiDi input.perform surface`);
+    } catch (e) { report('hover', 'FAIL', e.message); }
+
+    // 13. keyboard: Classic keys() works; no BiDi input.perform surface.
+    try {
+      await browser.url(BASE + '/');
+      await browser.$('#key-target').click();
+      await browser.keys('ArrowRight');
+      const result = await waitUntil(async () => {
+        const t = await pageText(browser, '#key-result');
+        return t === 'arrow-right' ? t : null;
+      }, 15000, 'key-result arrow-right');
+      report('keyboard', 'SKIP', `Classic keys() works (${result}) but Testplane/WDIO expose no BiDi input.perform surface`);
+    } catch (e) { report('keyboard', 'FAIL', e.message); }
+
+    // 14. multi-tab: Classic window handles work; no BiDi
+    // browsingContext surface in the WDIO v9 stack.
+    try {
+      await browser.url(BASE + '/');
+      const orig = await browser.getWindowHandle();
+      await browser.$('#link-newtab').click();
+      const handles = await waitUntil(async () => {
+        const hs = await browser.getWindowHandles();
+        return hs.length > 1 ? hs : null;
+      }, 15000, 'second window handle');
+      const tab = handles.find(h => h !== orig);
+      await browser.switchWindow(tab);
+      const url = await browser.getUrl();
+      if (!url.endsWith('/second')) throw new Error('tab url is ' + url);
+      await browser.closeWindow();
+      await browser.switchWindow(orig);
+      report('multi-tab', 'SKIP', `Classic window handles work (tab landed ${url}) but Testplane/WDIO expose no BiDi browsingContext surface`);
+    } catch (e) { report('multi-tab', 'FAIL', e.message); }
+
+    // 15. iframe: Classic switchFrame works; no BiDi frame surface.
+    try {
+      await browser.url(BASE + '/');
+      const frameEl = await browser.$('#probe-frame');
+      await browser.switchFrame(frameEl);
+      await browser.$('#inner-btn').click();
+      const result = await waitUntil(async () => {
+        const t = await pageText(browser, '#inner-result');
+        return t === 'inner-clicked' ? t : null;
+      }, 15000, 'inner-result inner-clicked');
+      await browser.switchFrame(null);
+      report('iframe', 'SKIP', `Classic switchFrame works (${result}) but Testplane/WDIO expose no BiDi frame surface`);
+    } catch (e) { report('iframe', 'FAIL', e.message); }
   });
 });

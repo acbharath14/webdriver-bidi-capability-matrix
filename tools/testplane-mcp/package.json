@@ -1,0 +1,1 @@
+{"author":"","dependencies":{"@testplane/mcp":"^0.9.0"},"description":"","keywords":[],"license":"ISC","main":"index.js","name":"testplane-mcp","scripts":{"test":"echo \"Error: no test specified\" && exit 1"},"version":"1.0.0"}

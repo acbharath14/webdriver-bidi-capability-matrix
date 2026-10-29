@@ -1,5 +1,6 @@
 // Wrapper: runs Cypress against Firefox and prints the shared
-// RESULT/SUMMARY contract from the results.json the spec wrote via tasks.
+// RESULT/SUMMARY/TIMING/SESSION contract from the results.json the spec
+// wrote via tasks.
 // Firefox: the bundled download lives in ../firefox/firefox/firefox; it is
 // put on PATH so `cypress run --browser firefox` detects it. If detection
 // fails, set CYPRESS_FIREFOX_PATH to the binary and the wrapper passes it
@@ -37,8 +38,12 @@ try {
   console.error('CYPRESS WRAPPER: no results file — cypress run failed (see output above)');
   process.exit(1);
 }
+if (data.meta && data.meta.cypress && data.meta.browser) {
+  console.log(`SESSION cypress=${data.meta.cypress} browser=${data.meta.browser}`);
+}
 for (const r of data.results) {
   console.log(`RESULT ${r.key} ${r.status}${r.detail ? ' ' + r.detail : ''}`);
+  if (typeof r.ms === 'number') console.log(`TIMING ${r.key} ${r.ms}`);
 }
 const p = data.results.filter(r => r.status === 'PASS').length;
 const f = data.results.filter(r => r.status === 'FAIL').length;

@@ -1,0 +1,1191 @@
+{
+  "generatedAt": "2026-10-28T03:47:07.980Z",
+  "probePort": 4333,
+  "nodeVersion": "24.22.1",
+  "results": {
+    "vibium": {
+      "label": "Vibium",
+      "notes": "tools/vibium/NOTES.md",
+      "cells": {
+        "navigation": "PASS",
+        "console-log": "PASS",
+        "js-error": "PASS",
+        "network-capture": "PASS",
+        "script-eval": "PASS",
+        "cookie": "PASS",
+        "screenshot": "PASS",
+        "dialog": "PASS",
+        "input-click": "PASS",
+        "network-intercept": "PASS",
+        "drag-and-drop": "PASS",
+        "hover": "PASS",
+        "keyboard": "PASS",
+        "multi-tab": "PASS",
+        "iframe": "PASS"
+      },
+      "details": {
+        "navigation": "landed http://127.0.0.1:4333/second",
+        "console-log": "type=log text=\"probe-log\"",
+        "js-error": "message=\"Error: probe-thrown\"",
+        "network-capture": "url=http://127.0.0.1:4333/api/ping status=200",
+        "script-eval": "1+1=2, title=BiDi Probe",
+        "cookie": "probe=chocochip via context API",
+        "screenshot": "bytes=30244 png-signature=yes",
+        "dialog": "dismissed=dismissed confirmed=confirmed",
+        "input-click": "Hello, Ada",
+        "network-intercept": "pattern=**/api/ping fetch-result=intercepted",
+        "drag-and-drop": "drag-result=dropped",
+        "hover": "hover-result=hovered",
+        "keyboard": "key-result=arrow-right",
+        "multi-tab": "tab landed http://127.0.0.1:4333/second marker=Second page",
+        "iframe": "inner-result=inner-clicked"
+      },
+      "timings": {
+        "navigation": 823,
+        "console-log": 315,
+        "js-error": 322,
+        "network-capture": 823,
+        "script-eval": 329,
+        "cookie": 665,
+        "screenshot": 567,
+        "dialog": 1370,
+        "input-click": 424,
+        "network-intercept": 654,
+        "drag-and-drop": 818,
+        "hover": 371,
+        "keyboard": 511,
+        "multi-tab": 682,
+        "iframe": 521
+      },
+      "session": {
+        "browser": "Vibium-managed-Chrome-for-Testing"
+      },
+      "setup": {
+        "toolPackage": "vibium",
+        "toolVersion": "26.8.21",
+        "browser": "Vibium-managed-Chrome-for-Testing",
+        "driver": "n/a (BiDi direct)",
+        "binaryPaths": {
+          "chrome": "/home/hatch/.cache/vibium/chrome-for-testing/156.0.8078.47/chrome",
+          "chromedriver": "/home/hatch/.cache/vibium/chrome-for-testing/156.0.8078.47/chromedriver",
+          "firefox": "/home/hatch/workspace/webdriver-bidi-capability-matrix/tools/firefox/firefox/firefox",
+          "geckodriver": "/home/hatch/workspace/webdriver-bidi-capability-matrix/tools/mcp/node_modules/.bin/geckodriver"
+        },
+        "session": {
+          "browser": "Vibium-managed-Chrome-for-Testing"
+        }
+      },
+      "summary": {
+        "pass": 15,
+        "fail": 0,
+        "skip": 0
+      },
+      "exitCode": 0,
+      "error": null,
+      "durationMs": 14485,
+      "ran": true
+    },
+    "vibium-firefox": {
+      "label": "Vibium (Firefox)",
+      "notes": "tools/vibium-firefox/NOTES.md",
+      "cells": {
+        "navigation": "PASS",
+        "console-log": "PASS",
+        "js-error": "PASS",
+        "network-capture": "PASS",
+        "script-eval": "PASS",
+        "cookie": "PASS",
+        "screenshot": "PASS",
+        "dialog": "PASS",
+        "input-click": "PASS",
+        "network-intercept": "PASS",
+        "drag-and-drop": "SKIP",
+        "hover": "PASS",
+        "keyboard": "PASS",
+        "multi-tab": "PASS",
+        "iframe": "PASS"
+      },
+      "details": {
+        "navigation": "landed http://127.0.0.1:4333/second",
+        "console-log": "type=log text=\"probe-log\"",
+        "js-error": "message=\"Error: probe-thrown\"",
+        "network-capture": "url=http://127.0.0.1:4333/api/ping status=200",
+        "script-eval": "1+1=2, title=BiDi Probe",
+        "cookie": "probe=chocochip via context API",
+        "screenshot": "bytes=50889 png-signature=yes",
+        "dialog": "dismissed=dismissed confirmed=confirmed",
+        "input-click": "Hello, Ada",
+        "network-intercept": "pattern=**/api/ping fetch-result=intercepted",
+        "drag-and-drop": "dragTo runs without error on Firefox but drop handler never fires (Chrome cell passes); Vibium Firefox drag is a no-op",
+        "hover": "hover-result=hovered",
+        "keyboard": "key-result=arrow-right",
+        "multi-tab": "tab landed http://127.0.0.1:4333/second marker=Second page",
+        "iframe": "inner-result=inner-clicked"
+      },
+      "timings": {
+        "navigation": 635,
+        "console-log": 519,
+        "js-error": 499,
+        "network-capture": 672,
+        "script-eval": 174,
+        "cookie": 287,
+        "screenshot": 266,
+        "dialog": 1373,
+        "input-click": 318,
+        "network-intercept": 310,
+        "drag-and-drop": 10664,
+        "hover": 339,
+        "keyboard": 400,
+        "multi-tab": 448,
+        "iframe": 384
+      },
+      "session": {
+        "browser": "Vibium-managed-Firefox/158.0"
+      },
+      "setup": {
+        "toolPackage": "vibium",
+        "toolVersion": "26.8.21",
+        "browser": "Vibium-managed-Firefox/158.0",
+        "driver": "n/a (BiDi direct)",
+        "binaryPaths": {
+          "chrome": "/home/hatch/.cache/vibium/chrome-for-testing/156.0.8078.47/chrome",
+          "chromedriver": "/home/hatch/.cache/vibium/chrome-for-testing/156.0.8078.47/chromedriver",
+          "firefox": "/home/hatch/workspace/webdriver-bidi-capability-matrix/tools/firefox/firefox/firefox",
+          "geckodriver": "/home/hatch/workspace/webdriver-bidi-capability-matrix/tools/mcp/node_modules/.bin/geckodriver"
+        },
+        "session": {
+          "browser": "Vibium-managed-Firefox/158.0"
+        }
+      },
+      "summary": {
+        "pass": 14,
+        "fail": 0,
+        "skip": 1
+      },
+      "exitCode": 0,
+      "error": null,
+      "durationMs": 26351,
+      "ran": true
+    },
+    "puppeteer": {
+      "label": "Puppeteer",
+      "notes": "tools/puppeteer/NOTES.md",
+      "cells": {
+        "navigation": "PASS",
+        "console-log": "PASS",
+        "js-error": "PASS",
+        "network-capture": "PASS",
+        "script-eval": "PASS",
+        "cookie": "PASS",
+        "screenshot": "PASS",
+        "dialog": "PASS",
+        "input-click": "PASS",
+        "network-intercept": "PASS",
+        "drag-and-drop": "PASS",
+        "hover": "PASS",
+        "keyboard": "PASS",
+        "multi-tab": "PASS",
+        "iframe": "PASS"
+      },
+      "details": {
+        "navigation": "landed http://127.0.0.1:4333/second",
+        "console-log": "type=log text=\"probe-log\"",
+        "js-error": "message=\"Error: probe-thrown\"",
+        "network-capture": "url=http://127.0.0.1:4333/api/ping status=200",
+        "script-eval": "1+1=2, title=BiDi Probe",
+        "cookie": "probe=chocochip via page cookie API",
+        "screenshot": "bytes=32685 png-signature=yes",
+        "dialog": "dismissed=dismissed confirmed=confirmed",
+        "input-click": "Hello, Ada",
+        "network-intercept": "fetch-result=intercepted",
+        "drag-and-drop": "drag-result=dropped",
+        "hover": "hover-result=hovered",
+        "keyboard": "key-result=arrow-right",
+        "multi-tab": "tab landed http://127.0.0.1:4333/second",
+        "iframe": "inner-result=inner-clicked"
+      },
+      "timings": {
+        "navigation": 484,
+        "console-log": 516,
+        "js-error": 314,
+        "network-capture": 469,
+        "script-eval": 185,
+        "cookie": 223,
+        "screenshot": 305,
+        "dialog": 408,
+        "input-click": 363,
+        "network-intercept": 268,
+        "drag-and-drop": 443,
+        "hover": 331,
+        "keyboard": 270,
+        "multi-tab": 542,
+        "iframe": 346
+      },
+      "session": {
+        "browser": "Chrome/156.0.8078.47"
+      },
+      "setup": {
+        "toolPackage": "puppeteer",
+        "toolVersion": "25.16.0",
+        "browser": "Chrome/156.0.8078.47",
+        "driver": "n/a (BiDi direct)",
+        "binaryPaths": {
+          "chrome": "/home/hatch/.cache/vibium/chrome-for-testing/156.0.8078.47/chrome",
+          "chromedriver": "/home/hatch/.cache/vibium/chrome-for-testing/156.0.8078.47/chromedriver",
+          "firefox": "/home/hatch/workspace/webdriver-bidi-capability-matrix/tools/firefox/firefox/firefox",
+          "geckodriver": "/home/hatch/workspace/webdriver-bidi-capability-matrix/tools/mcp/node_modules/.bin/geckodriver"
+        },
+        "session": {
+          "browser": "Chrome/156.0.8078.47"
+        }
+      },
+      "summary": {
+        "pass": 15,
+        "fail": 0,
+        "skip": 0
+      },
+      "exitCode": 0,
+      "error": null,
+      "durationMs": 8947,
+      "ran": true
+    },
+    "puppeteer-firefox": {
+      "label": "Puppeteer (Firefox)",
+      "notes": "tools/puppeteer-firefox/NOTES.md",
+      "cells": {
+        "navigation": "PASS",
+        "console-log": "PASS",
+        "js-error": "PASS",
+        "network-capture": "PASS",
+        "script-eval": "PASS",
+        "cookie": "PASS",
+        "screenshot": "PASS",
+        "dialog": "PASS",
+        "input-click": "PASS",
+        "network-intercept": "PASS",
+        "drag-and-drop": "SKIP",
+        "hover": "PASS",
+        "keyboard": "PASS",
+        "multi-tab": "PASS",
+        "iframe": "PASS"
+      },
+      "details": {
+        "navigation": "landed http://127.0.0.1:4333/second",
+        "console-log": "type=log text=\"probe-log\"",
+        "js-error": "message=\"Error: probe-thrown\"",
+        "network-capture": "url=http://127.0.0.1:4333/api/ping status=200",
+        "script-eval": "1+1=2, title=BiDi Probe",
+        "cookie": "probe=chocochip via page cookie API",
+        "screenshot": "bytes=44404 png-signature=yes",
+        "dialog": "dismissed=dismissed confirmed=confirmed",
+        "input-click": "Hello, Ada",
+        "network-intercept": "fetch-result=intercepted",
+        "drag-and-drop": "mouse drag runs without error on Firefox but drop handler never fires (Chrome cell passes); Firefox BiDi pointer drag does not produce HTML5 drag events",
+        "hover": "hover-result=hovered",
+        "keyboard": "key-result=arrow-right",
+        "multi-tab": "tab landed http://127.0.0.1:4333/second",
+        "iframe": "inner-result=inner-clicked"
+      },
+      "timings": {
+        "navigation": 1129,
+        "console-log": 617,
+        "js-error": 495,
+        "network-capture": 626,
+        "script-eval": 325,
+        "cookie": 315,
+        "screenshot": 395,
+        "dialog": 1141,
+        "input-click": 657,
+        "network-intercept": 630,
+        "drag-and-drop": 10579,
+        "hover": 508,
+        "keyboard": 560,
+        "multi-tab": 784,
+        "iframe": 671
+      },
+      "session": {
+        "browser": "firefox/158.0.1"
+      },
+      "setup": {
+        "toolPackage": "puppeteer",
+        "toolVersion": "25.16.0",
+        "browser": "firefox/158.0.1",
+        "driver": "n/a (BiDi direct)",
+        "binaryPaths": {
+          "chrome": "/home/hatch/.cache/vibium/chrome-for-testing/156.0.8078.47/chrome",
+          "chromedriver": "/home/hatch/.cache/vibium/chrome-for-testing/156.0.8078.47/chromedriver",
+          "firefox": "/home/hatch/workspace/webdriver-bidi-capability-matrix/tools/firefox/firefox/firefox",
+          "geckodriver": "/home/hatch/workspace/webdriver-bidi-capability-matrix/tools/mcp/node_modules/.bin/geckodriver"
+        },
+        "session": {
+          "browser": "firefox/158.0.1"
+        }
+      },
+      "summary": {
+        "pass": 14,
+        "fail": 0,
+        "skip": 1
+      },
+      "exitCode": 0,
+      "error": null,
+      "durationMs": 26873,
+      "ran": true
+    },
+    "selenium": {
+      "label": "Selenium",
+      "notes": "tools/selenium/NOTES.md",
+      "cells": {
+        "navigation": "PASS",
+        "console-log": "PASS",
+        "js-error": "PASS",
+        "network-capture": "PASS",
+        "script-eval": "PASS",
+        "cookie": "PASS",
+        "screenshot": "PASS",
+        "dialog": "SKIP",
+        "input-click": "PASS",
+        "network-intercept": "PASS",
+        "drag-and-drop": "PASS",
+        "hover": "PASS",
+        "keyboard": "PASS",
+        "multi-tab": "PASS",
+        "iframe": "SKIP"
+      },
+      "details": {
+        "navigation": "landed http://127.0.0.1:4333/second",
+        "console-log": "probe-log",
+        "js-error": "Error: probe-thrown",
+        "network-capture": "{\"_id\":\"AB42AB67DA08230E2759E912EF95E08A\",\"_navigation\":null,\"_redirectCount\":0,\"_request\":{\"_request\":\"17418.3\",\"_url\":\"http://127.0.0.1:4333/api/ping\",\"_metho",
+        "script-eval": "1+1=2, title=BiDi Probe",
+        "cookie": "probe=chocochip via BiDi storage",
+        "screenshot": "bytes=21789 png-signature=yes",
+        "dialog": "userPromptOpened fires (2 observed) but handleUserPrompt fails 'no such alert': chromedriver mapper auto-dismisses prompts (confirm->dismissed); Classic alert API fails identically; accept path unusable",
+        "input-click": "Hello, Ada",
+        "network-intercept": "fetch-result=intercepted",
+        "drag-and-drop": "drag-result=dropped",
+        "hover": "hover-result=hovered",
+        "keyboard": "key-result=arrow-right",
+        "multi-tab": "tab landed http://127.0.0.1:4333/second marker=Second page",
+        "iframe": "BiDi input click in frame contexts is a mapper no-op (runs, no effect); script click in the same frame works"
+      },
+      "timings": {
+        "navigation": 425,
+        "console-log": 335,
+        "js-error": 511,
+        "network-capture": 501,
+        "script-eval": 232,
+        "cookie": 263,
+        "screenshot": 347,
+        "dialog": 357,
+        "input-click": 444,
+        "network-intercept": 561,
+        "drag-and-drop": 372,
+        "hover": 320,
+        "keyboard": 395,
+        "multi-tab": 611,
+        "iframe": 5642
+      },
+      "session": {
+        "browser": "156.0.8078.47"
+      },
+      "setup": {
+        "toolPackage": "selenium-webdriver",
+        "toolVersion": "4.51.0",
+        "browser": "156.0.8078.47",
+        "driver": "ChromeDriver 156.0.8078.47",
+        "binaryPaths": {
+          "chrome": "/home/hatch/.cache/vibium/chrome-for-testing/156.0.8078.47/chrome",
+          "chromedriver": "/home/hatch/.cache/vibium/chrome-for-testing/156.0.8078.47/chromedriver",
+          "firefox": "/home/hatch/workspace/webdriver-bidi-capability-matrix/tools/firefox/firefox/firefox",
+          "geckodriver": "/home/hatch/workspace/webdriver-bidi-capability-matrix/tools/mcp/node_modules/.bin/geckodriver"
+        },
+        "session": {
+          "browser": "156.0.8078.47"
+        }
+      },
+      "summary": {
+        "pass": 13,
+        "fail": 0,
+        "skip": 2
+      },
+      "exitCode": 0,
+      "error": null,
+      "durationMs": 14263,
+      "ran": true
+    },
+    "selenium-firefox": {
+      "label": "Selenium (Firefox)",
+      "notes": "tools/selenium-firefox/NOTES.md",
+      "cells": {
+        "navigation": "PASS",
+        "console-log": "PASS",
+        "js-error": "PASS",
+        "network-capture": "PASS",
+        "script-eval": "PASS",
+        "cookie": "PASS",
+        "screenshot": "PASS",
+        "dialog": "SKIP",
+        "input-click": "PASS",
+        "network-intercept": "PASS",
+        "drag-and-drop": "SKIP",
+        "hover": "PASS",
+        "keyboard": "PASS",
+        "multi-tab": "PASS",
+        "iframe": "PASS"
+      },
+      "details": {
+        "navigation": "landed http://127.0.0.1:4333/second",
+        "console-log": "probe-log",
+        "js-error": "Error: probe-thrown",
+        "network-capture": "{\"_id\":\"035a7bc5-9d43-4c74-a32f-7f020f4a91c4\",\"_navigation\":null,\"_redirectCount\":0,\"_request\":{\"_request\":\"28-5736eb4f-f849-4127-9e4c-080c00a3a241\",\"_url\":\"htt",
+        "script-eval": "1+1=2, title=BiDi Probe",
+        "cookie": "probe=chocochip via BiDi storage",
+        "screenshot": "bytes=48075 png-signature=yes",
+        "dialog": "userPromptOpened fires (1 observed) but handleUserPrompt fails 'no such alert': geckodriver mapper auto-dismisses prompts (confirm->dismissed); Classic alert API fails identically; accept path unusable",
+        "input-click": "Hello, Ada",
+        "network-intercept": "fetch-result=intercepted",
+        "drag-and-drop": "BiDi pointer drag runs without error on Firefox but drop handler never fires (Chrome cell passes); Firefox BiDi pointer drag does not produce HTML5 drag events",
+        "hover": "hover-result=hovered",
+        "keyboard": "key-result=arrow-right",
+        "multi-tab": "tab landed http://127.0.0.1:4333/second marker=Second page",
+        "iframe": "inner-result=inner-clicked"
+      },
+      "timings": {
+        "navigation": 709,
+        "console-log": 676,
+        "js-error": 361,
+        "network-capture": 481,
+        "script-eval": 279,
+        "cookie": 246,
+        "screenshot": 428,
+        "dialog": 509,
+        "input-click": 355,
+        "network-intercept": 568,
+        "drag-and-drop": 10851,
+        "hover": 279,
+        "keyboard": 605,
+        "multi-tab": 1076,
+        "iframe": 527
+      },
+      "session": {
+        "browser": "Firefox/158.0.1"
+      },
+      "setup": {
+        "toolPackage": "selenium-webdriver",
+        "toolVersion": "4.51.0",
+        "browser": "Firefox/158.0.1",
+        "driver": "geckodriver 0.37.1",
+        "binaryPaths": {
+          "chrome": "/home/hatch/.cache/vibium/chrome-for-testing/156.0.8078.47/chrome",
+          "chromedriver": "/home/hatch/.cache/vibium/chrome-for-testing/156.0.8078.47/chromedriver",
+          "firefox": "/home/hatch/workspace/webdriver-bidi-capability-matrix/tools/firefox/firefox/firefox",
+          "geckodriver": "/home/hatch/workspace/webdriver-bidi-capability-matrix/tools/mcp/node_modules/.bin/geckodriver"
+        },
+        "session": {
+          "browser": "Firefox/158.0.1"
+        }
+      },
+      "summary": {
+        "pass": 13,
+        "fail": 0,
+        "skip": 2
+      },
+      "exitCode": 0,
+      "error": null,
+      "durationMs": 25265,
+      "ran": true
+    },
+    "webdriverio": {
+      "label": "WebdriverIO",
+      "notes": "tools/webdriverio/NOTES.md",
+      "cells": {
+        "navigation": "PASS",
+        "console-log": "PASS",
+        "js-error": "PASS",
+        "network-capture": "PASS",
+        "script-eval": "PASS",
+        "cookie": "PASS",
+        "screenshot": "SKIP",
+        "dialog": "PASS",
+        "input-click": "SKIP",
+        "network-intercept": "PASS",
+        "drag-and-drop": "SKIP",
+        "hover": "SKIP",
+        "keyboard": "SKIP",
+        "multi-tab": "SKIP",
+        "iframe": "SKIP"
+      },
+      "details": {
+        "navigation": "committed url=http://127.0.0.1:4333/second",
+        "console-log": "type=console method=log text=probe-log",
+        "js-error": "type=javascript level=error text=Error: probe-thrown",
+        "network-capture": "url=http://127.0.0.1:4333/api/ping status=200",
+        "script-eval": "1+1=2 title=BiDi Probe",
+        "cookie": "probe=chocochip via BiDi storage",
+        "screenshot": "Classic saveScreenshot works (21494 bytes PNG) but WDIO v9 exposes no BiDi captureScreenshot surface",
+        "dialog": "dialogs=[alert:probe-alert, confirm:probe-confirm, confirm:probe-confirm] dismissed+confirmed both observed",
+        "input-click": "Classic click+setValue works (Hello, Ada) but WDIO v9 exposes no BiDi input.perform surface",
+        "network-intercept": "fetch-result=intercepted mock-calls=1",
+        "drag-and-drop": "Classic dragAndDrop works (dropped) but WDIO v9 exposes no BiDi input.perform surface",
+        "hover": "Classic moveTo works (hovered) but WDIO v9 exposes no BiDi input.perform surface",
+        "keyboard": "Classic keys() works (arrow-right) but WDIO v9 exposes no BiDi input.perform surface",
+        "multi-tab": "Classic window handles work (tab landed http://127.0.0.1:4333/second) but WDIO v9 exposes no BiDi browsingContext surface",
+        "iframe": "Classic switchFrame works (inner-clicked) but WDIO v9 exposes no BiDi frame surface"
+      },
+      "timings": {
+        "navigation": 246,
+        "console-log": 917,
+        "js-error": 308,
+        "network-capture": 363,
+        "script-eval": 11,
+        "cookie": 37,
+        "screenshot": 71,
+        "dialog": 232,
+        "input-click": 160,
+        "network-intercept": 329,
+        "drag-and-drop": 363,
+        "hover": 281,
+        "keyboard": 240,
+        "multi-tab": 432,
+        "iframe": 321
+      },
+      "session": {
+        "isBidi": "true",
+        "webSocketUrl": "present",
+        "browser": "156.0.8078.47"
+      },
+      "setup": {
+        "toolPackage": "webdriverio",
+        "toolVersion": "9.32.0",
+        "browser": "156.0.8078.47",
+        "driver": "ChromeDriver 156.0.8078.47",
+        "binaryPaths": {
+          "chrome": "/home/hatch/.cache/vibium/chrome-for-testing/156.0.8078.47/chrome",
+          "chromedriver": "/home/hatch/.cache/vibium/chrome-for-testing/156.0.8078.47/chromedriver",
+          "firefox": "/home/hatch/workspace/webdriver-bidi-capability-matrix/tools/firefox/firefox/firefox",
+          "geckodriver": "/home/hatch/workspace/webdriver-bidi-capability-matrix/tools/mcp/node_modules/.bin/geckodriver"
+        },
+        "session": {
+          "isBidi": "true",
+          "webSocketUrl": "present",
+          "browser": "156.0.8078.47"
+        }
+      },
+      "summary": {
+        "pass": 8,
+        "fail": 0,
+        "skip": 7
+      },
+      "exitCode": 0,
+      "error": null,
+      "durationMs": 10581,
+      "ran": true
+    },
+    "webdriverio-firefox": {
+      "label": "WebdriverIO (Firefox)",
+      "notes": "tools/webdriverio-firefox/NOTES.md",
+      "cells": {
+        "navigation": "PASS",
+        "console-log": "PASS",
+        "js-error": "PASS",
+        "network-capture": "PASS",
+        "script-eval": "PASS",
+        "cookie": "PASS",
+        "screenshot": "SKIP",
+        "dialog": "PASS",
+        "input-click": "SKIP",
+        "network-intercept": "FAIL",
+        "drag-and-drop": "SKIP",
+        "hover": "SKIP",
+        "keyboard": "SKIP",
+        "multi-tab": "SKIP",
+        "iframe": "SKIP"
+      },
+      "details": {
+        "navigation": "committed url=http://127.0.0.1:4333/second",
+        "console-log": "type=console method=log text=probe-log",
+        "js-error": "type=javascript level=error text=Error: probe-thrown",
+        "network-capture": "url=http://127.0.0.1:4333/api/ping status=200",
+        "script-eval": "1+1=2 title=BiDi Probe",
+        "cookie": "probe=chocochip via BiDi storage",
+        "screenshot": "Classic saveScreenshot works (50748 bytes PNG) but WDIO v9 exposes no BiDi captureScreenshot surface",
+        "dialog": "dialogs=[alert:probe-alert, confirm:probe-confirm, confirm:probe-confirm] dismissed+confirmed both observed",
+        "input-click": "Classic click+setValue works (Hello, Ada) but WDIO v9 exposes no BiDi input.perform surface",
+        "network-intercept": "mock body rejected on Firefox: WebDriver Bidi command \"network.provideResponse\" failed with error: unsupported operation - The \"body\" parameter is only supported for the beforeRequestSent phase at the moment",
+        "drag-and-drop": "Classic dragAndDrop runs without error on Firefox but drop handler never fires (Chrome Classic drag works); WDIO v9 exposes no BiDi input.perform surface",
+        "hover": "Classic moveTo works (hovered) but WDIO v9 exposes no BiDi input.perform surface",
+        "keyboard": "Classic keys() works (arrow-right) but WDIO v9 exposes no BiDi input.perform surface",
+        "multi-tab": "Classic window handles work (tab landed http://127.0.0.1:4333/second) but WDIO v9 exposes no BiDi browsingContext surface",
+        "iframe": "Classic switchFrame works (inner-clicked) but WDIO v9 exposes no BiDi frame surface"
+      },
+      "timings": {
+        "navigation": 325,
+        "console-log": 633,
+        "js-error": 102,
+        "network-capture": 95,
+        "script-eval": 6,
+        "cookie": 12,
+        "screenshot": 80,
+        "dialog": 679,
+        "input-click": 104,
+        "network-intercept": 15340,
+        "drag-and-drop": 15405,
+        "hover": 263,
+        "keyboard": 206,
+        "multi-tab": 273,
+        "iframe": 209
+      },
+      "session": {
+        "isBidi": "true",
+        "webSocketUrl": "present",
+        "browser": "Firefox/158.0.1"
+      },
+      "setup": {
+        "toolPackage": "webdriverio",
+        "toolVersion": "9.32.0",
+        "browser": "Firefox/158.0.1",
+        "driver": "geckodriver 0.37.1",
+        "binaryPaths": {
+          "chrome": "/home/hatch/.cache/vibium/chrome-for-testing/156.0.8078.47/chrome",
+          "chromedriver": "/home/hatch/.cache/vibium/chrome-for-testing/156.0.8078.47/chromedriver",
+          "firefox": "/home/hatch/workspace/webdriver-bidi-capability-matrix/tools/firefox/firefox/firefox",
+          "geckodriver": "/home/hatch/workspace/webdriver-bidi-capability-matrix/tools/mcp/node_modules/.bin/geckodriver"
+        },
+        "session": {
+          "isBidi": "true",
+          "webSocketUrl": "present",
+          "browser": "Firefox/158.0.1"
+        }
+      },
+      "summary": {
+        "pass": 7,
+        "fail": 1,
+        "skip": 7
+      },
+      "exitCode": 1,
+      "error": null,
+      "durationMs": 41489,
+      "ran": true
+    },
+    "testplane": {
+      "label": "Testplane",
+      "notes": "tools/testplane/NOTES.md",
+      "cells": {
+        "navigation": "PASS",
+        "console-log": "PASS",
+        "js-error": "PASS",
+        "network-capture": "PASS",
+        "script-eval": "PASS",
+        "cookie": "PASS",
+        "screenshot": "SKIP",
+        "dialog": "SKIP",
+        "input-click": "SKIP",
+        "network-intercept": "PASS",
+        "drag-and-drop": "SKIP",
+        "hover": "SKIP",
+        "keyboard": "SKIP",
+        "multi-tab": "SKIP",
+        "iframe": "SKIP"
+      },
+      "details": {
+        "navigation": "committed url=http://127.0.0.1:4333/second",
+        "console-log": "type=console method=log text=probe-log",
+        "js-error": "type=javascript level=error text=Error: probe-thrown",
+        "network-capture": "url=http://127.0.0.1:4333/api/ping status=200",
+        "script-eval": "1+1=2 title=BiDi Probe",
+        "cookie": "probe=chocochip via BiDi storage",
+        "screenshot": "Classic saveScreenshot works (21494 bytes PNG) but Testplane/WDIO expose no BiDi captureScreenshot surface",
+        "dialog": "dialog events fire ([alert:probe-alert, confirm:probe-confirm, confirm:probe-confirm]) but accept()/dismiss() fail 'no such alert' (results: dismiss-leg=dismissed accept-leg=dismissed); prompt auto-dismissed before handling",
+        "input-click": "Classic click+setValue works (Hello, Ada) but Testplane/WDIO expose no BiDi input.perform surface",
+        "network-intercept": "fetch-result=intercepted mock-calls=1",
+        "drag-and-drop": "Classic dragAndDrop works (dropped) but Testplane/WDIO expose no BiDi input.perform surface",
+        "hover": "Classic moveTo works (hovered) but Testplane/WDIO expose no BiDi input.perform surface",
+        "keyboard": "Classic keys() works (arrow-right) but Testplane/WDIO expose no BiDi input.perform surface",
+        "multi-tab": "Classic window handles work (tab landed http://127.0.0.1:4333/second) but Testplane/WDIO expose no BiDi browsingContext surface",
+        "iframe": "Classic switchFrame works (inner-clicked) but Testplane/WDIO expose no BiDi frame surface"
+      },
+      "timings": {
+        "navigation": 197,
+        "console-log": 719,
+        "js-error": 368,
+        "network-capture": 332,
+        "script-eval": 17,
+        "cookie": 18,
+        "screenshot": 57,
+        "dialog": 364,
+        "input-click": 210,
+        "network-intercept": 358,
+        "drag-and-drop": 393,
+        "hover": 323,
+        "keyboard": 342,
+        "multi-tab": 692,
+        "iframe": 402
+      },
+      "session": {
+        "isBidi": "true",
+        "webSocketUrl": "string",
+        "browser": "156.0.8078.47"
+      },
+      "setup": {
+        "toolPackage": "testplane",
+        "toolVersion": "9.3.4",
+        "browser": "156.0.8078.47",
+        "driver": "ChromeDriver 156.0.8078.47",
+        "binaryPaths": {
+          "chrome": "/home/hatch/.cache/vibium/chrome-for-testing/156.0.8078.47/chrome",
+          "chromedriver": "/home/hatch/.cache/vibium/chrome-for-testing/156.0.8078.47/chromedriver",
+          "firefox": "/home/hatch/workspace/webdriver-bidi-capability-matrix/tools/firefox/firefox/firefox",
+          "geckodriver": "/home/hatch/workspace/webdriver-bidi-capability-matrix/tools/mcp/node_modules/.bin/geckodriver"
+        },
+        "session": {
+          "isBidi": "true",
+          "webSocketUrl": "string",
+          "browser": "156.0.8078.47"
+        }
+      },
+      "summary": {
+        "pass": 7,
+        "fail": 0,
+        "skip": 8
+      },
+      "exitCode": 0,
+      "error": null,
+      "durationMs": 13514,
+      "ran": true
+    },
+    "testplane-firefox": {
+      "label": "Testplane (Firefox)",
+      "notes": "tools/testplane-firefox/NOTES.md",
+      "cells": {
+        "navigation": "PASS",
+        "console-log": "PASS",
+        "js-error": "PASS",
+        "network-capture": "PASS",
+        "script-eval": "PASS",
+        "cookie": "PASS",
+        "screenshot": "SKIP",
+        "dialog": "SKIP",
+        "input-click": "SKIP",
+        "network-intercept": "FAIL",
+        "drag-and-drop": "SKIP",
+        "hover": "SKIP",
+        "keyboard": "SKIP",
+        "multi-tab": "SKIP",
+        "iframe": "SKIP"
+      },
+      "details": {
+        "navigation": "committed url=http://127.0.0.1:4333/second",
+        "console-log": "type=console method=log text=probe-log",
+        "js-error": "type=javascript level=error text=Error: probe-thrown",
+        "network-capture": "url=http://127.0.0.1:4333/api/ping status=200",
+        "script-eval": "1+1=2 title=BiDi Probe",
+        "cookie": "probe=chocochip via BiDi storage",
+        "screenshot": "Classic saveScreenshot works (50748 bytes PNG) but Testplane/WDIO expose no BiDi captureScreenshot surface",
+        "dialog": "dialog events fire ([alert:probe-alert, confirm:probe-confirm, confirm:probe-confirm]) but accept()/dismiss() fail 'no such alert' (results: dismiss-leg=dismissed accept-leg=dismissed); prompt auto-dismissed before handling",
+        "input-click": "Classic click+setValue works (Hello, Ada) but Testplane/WDIO expose no BiDi input.perform surface",
+        "network-intercept": "mock body rejected on Firefox: network.provideResponse body only supported in beforeRequestSent; WDIO/Testplane mock provides body at responseStarted (worker-terminating unhandled rejection, reproduced)",
+        "drag-and-drop": "Classic dragAndDrop runs without error on Firefox but drop handler never fires (Chrome Classic drag works); Testplane/WDIO expose no BiDi input.perform surface",
+        "hover": "Classic moveTo works (hovered) but Testplane/WDIO expose no BiDi input.perform surface",
+        "keyboard": "Classic keys() works (arrow-right) but Testplane/WDIO expose no BiDi input.perform surface",
+        "multi-tab": "Classic window handles work (tab landed http://127.0.0.1:4333/second) but Testplane/WDIO expose no BiDi browsingContext surface",
+        "iframe": "Classic switchFrame works (inner-clicked) but Testplane/WDIO expose no BiDi frame surface"
+      },
+      "timings": {
+        "navigation": 295,
+        "console-log": 322,
+        "js-error": 70,
+        "network-capture": 73,
+        "script-eval": 6,
+        "cookie": 6,
+        "screenshot": 72,
+        "dialog": 617,
+        "input-click": 106,
+        "network-intercept": 0,
+        "drag-and-drop": 15338,
+        "hover": 260,
+        "keyboard": 216,
+        "multi-tab": 325,
+        "iframe": 290
+      },
+      "session": {
+        "isBidi": "true",
+        "webSocketUrl": "string",
+        "browser": "Firefox/158.0.1"
+      },
+      "setup": {
+        "toolPackage": "testplane",
+        "toolVersion": "9.3.4",
+        "browser": "Firefox/158.0.1",
+        "driver": "geckodriver 0.37.1",
+        "binaryPaths": {
+          "chrome": "/home/hatch/.cache/vibium/chrome-for-testing/156.0.8078.47/chrome",
+          "chromedriver": "/home/hatch/.cache/vibium/chrome-for-testing/156.0.8078.47/chromedriver",
+          "firefox": "/home/hatch/workspace/webdriver-bidi-capability-matrix/tools/firefox/firefox/firefox",
+          "geckodriver": "/home/hatch/workspace/webdriver-bidi-capability-matrix/tools/mcp/node_modules/.bin/geckodriver"
+        },
+        "session": {
+          "isBidi": "true",
+          "webSocketUrl": "string",
+          "browser": "Firefox/158.0.1"
+        }
+      },
+      "summary": {
+        "pass": 6,
+        "fail": 1,
+        "skip": 8
+      },
+      "exitCode": 1,
+      "error": null,
+      "durationMs": 40871,
+      "ran": true
+    },
+    "cypress": {
+      "label": "Cypress",
+      "notes": "tools/cypress/NOTES.md",
+      "cells": {
+        "navigation": "PASS",
+        "console-log": "SKIP",
+        "js-error": "PASS",
+        "network-capture": "SKIP",
+        "script-eval": "PASS",
+        "cookie": "PASS",
+        "screenshot": "PASS",
+        "dialog": "PASS",
+        "input-click": "PASS",
+        "network-intercept": "SKIP",
+        "drag-and-drop": "SKIP",
+        "hover": "SKIP",
+        "keyboard": "SKIP",
+        "multi-tab": "SKIP",
+        "iframe": "PASS"
+      },
+      "details": {
+        "navigation": "url=http://127.0.0.1:4333/second",
+        "console-log": "no spec-level BiDi log-event surface in Cypress; console output only appears in runner logs",
+        "js-error": "captured=The following error originated from your application code, not from Cypress. | > probe-thrown | When Cypress detects uncaught errors originating from your application it will automatically fail the current test. | This behavior is configurable, and you can choose to turn this off by listening to the `uncaught:exception` event.",
+        "network-capture": "fetch works (fetch-result=pong) but cy.intercept is proxy-based, not BiDi; no spec-level BiDi network subscription",
+        "script-eval": "1+1=2 title=BiDi Probe",
+        "cookie": "probe=chocochip",
+        "screenshot": "cy.screenshot viewport capture succeeded",
+        "dialog": "alert seen; confirm dismissed then confirmed via one variable-driven window:confirm handler; seen=[alert:probe-alert, confirm:probe-confirm, confirm:probe-confirm]",
+        "input-click": "typed Ada, clicked greet, Hello, Ada observed",
+        "network-intercept": "cy.intercept stub works (fetch-result=intercepted) but via Cypress proxy, not BiDi interception",
+        "drag-and-drop": "trigger dragstart/dragover/drop works (drag-result=dropped) but Cypress has no native drag or BiDi input API; synthetic events only",
+        "hover": "trigger mouseover works (hover-result=hovered) but Cypress has no real hover or BiDi input API; synthetic events only",
+        "keyboard": "trigger keydown works (key-result=arrow-right) but cy.type() cannot target a non-input focusable element and trigger is synthetic, not BiDi input",
+        "multi-tab": "Cypress is single-tab by architecture; it cannot open, switch to, or assert a new tab",
+        "iframe": "inner-clicked via contentDocument iframe access"
+      },
+      "timings": {
+        "navigation": 270,
+        "console-log": 347,
+        "js-error": 778,
+        "network-capture": 304,
+        "script-eval": 199,
+        "cookie": 333,
+        "screenshot": 597,
+        "dialog": 530,
+        "input-click": 425,
+        "network-intercept": 281,
+        "drag-and-drop": 274,
+        "hover": 247,
+        "keyboard": 296,
+        "multi-tab": 109,
+        "iframe": 298
+      },
+      "session": {
+        "cypress": "16.2.0",
+        "browser": "firefox/158.0.1"
+      },
+      "setup": {
+        "toolPackage": "cypress",
+        "toolVersion": "16.2.0",
+        "browser": "firefox/158.0.1",
+        "driver": "n/a (Cypress drives Firefox)",
+        "binaryPaths": {
+          "chrome": "/home/hatch/.cache/vibium/chrome-for-testing/156.0.8078.47/chrome",
+          "chromedriver": "/home/hatch/.cache/vibium/chrome-for-testing/156.0.8078.47/chromedriver",
+          "firefox": "/home/hatch/workspace/webdriver-bidi-capability-matrix/tools/firefox/firefox/firefox",
+          "geckodriver": "/home/hatch/workspace/webdriver-bidi-capability-matrix/tools/mcp/node_modules/.bin/geckodriver"
+        },
+        "session": {
+          "cypress": "16.2.0",
+          "browser": "firefox/158.0.1"
+        }
+      },
+      "summary": {
+        "pass": 8,
+        "fail": 0,
+        "skip": 7
+      },
+      "exitCode": 0,
+      "error": null,
+      "durationMs": 23367,
+      "ran": true
+    },
+    "mcp": {
+      "label": "Firefox DevTools MCP",
+      "notes": "tools/mcp/NOTES.md",
+      "cells": {
+        "navigation": "PASS",
+        "console-log": "PASS",
+        "js-error": "PASS",
+        "network-capture": "PASS",
+        "script-eval": "PASS",
+        "cookie": "SKIP",
+        "screenshot": "PASS",
+        "dialog": "SKIP",
+        "input-click": "PASS",
+        "network-intercept": "SKIP",
+        "drag-and-drop": "PASS",
+        "hover": "PASS",
+        "keyboard": "PASS",
+        "multi-tab": "PASS",
+        "iframe": "SKIP"
+      },
+      "details": {
+        "navigation": "href=http://127.0.0.1:4333/second",
+        "console-log": "{ |   \"total\": 1, |   \"filtered\": 1, |   \"showing\": 1, |   \"hasMore\": false, |   \"filters\": \"textContains=\\\"probe-log\\\"\", |   \"messages\": [ |     { |       \"level\": \"info\", |       \"text\": \"probe-log\", |       \"source\": ",
+        "js-error": "{ |   \"total\": 2, |   \"filtered\": 1, |   \"showing\": 1, |   \"hasMore\": false, |   \"filters\": \"textContains=\\\"probe-thrown\\\"\", |   \"messages\": [ |     { |       \"level\": \"error\", |       \"text\": \"Error: probe-thrown\", |   ",
+        "network-capture": "{ |   \"total\": 1, |   \"showing\": 1, |   \"hasMore\": false, |   \"requests\": [ |     { |       \"id\": \"42-99a49c95-a53e-4096-8ac7-9a26ea77f7d3\", |       \"url\": \"http://127.0.0.1:4333/api/ping\", |       \"method\": \"GET\", |  ",
+        "script-eval": "1+1=2 title=BiDi Probe",
+        "cookie": "document.cookie round-trips via evaluate_script (probe=chocochip) but the server exposes no dedicated cookie tool",
+        "screenshot": "image image/png 67884 chars base64",
+        "dialog": "accept_dialog/dismiss_dialog exist but handling fails (Failed to accept/dismiss dialog); prompts auto-dismissed before the tool runs (confirm always dismissed, accept leg never confirmed); errs=[alert-accept: tool accept_dialog returned isError: Error: Failed to accept dialog: ; dismiss: tool dismiss_dialog returned isError: Error: Failed to dismiss dialog: ; accept: tool accept_dialog returned isError: Error: Failed to accept dialog: ]",
+        "input-click": "Hello, Ada via fill_by_uid + click_by_uid",
+        "network-intercept": "no interception tool in the server tool list (list/get only; set_network_cache is cache control, not interception)",
+        "drag-and-drop": "drag-result=dropped via drag_by_uid_to_uid",
+        "hover": "hover-result=hovered via hover_by_uid",
+        "keyboard": "key-result=arrow-right via press_key ArrowRight",
+        "multi-tab": "new tab 1 showed Second page; returned to probe tab",
+        "iframe": "no frame tool in the server tool list (49 tools); snapshot shows the iframe element but no tool can switch into it or click inside; evaluate_script is observation-only by the matrix design rule"
+      },
+      "timings": {
+        "navigation": 4691,
+        "console-log": 342,
+        "js-error": 229,
+        "network-capture": 257,
+        "script-eval": 80,
+        "cookie": 103,
+        "screenshot": 138,
+        "dialog": 6502,
+        "input-click": 231,
+        "network-intercept": 0,
+        "drag-and-drop": 174,
+        "hover": 129,
+        "keyboard": 120,
+        "multi-tab": 509,
+        "iframe": 0
+      },
+      "session": {
+        "mcp-server": "0.10.6",
+        "tools": "49",
+        "has-cookie-tool": "false",
+        "has-intercept-tool": "false"
+      },
+      "setup": {
+        "toolPackage": "@mozilla/firefox-devtools-mcp",
+        "toolVersion": "0.10.6",
+        "browser": "Mozilla Firefox 158.0.1",
+        "driver": "geckodriver 0.37.1",
+        "binaryPaths": {
+          "chrome": "/home/hatch/.cache/vibium/chrome-for-testing/156.0.8078.47/chrome",
+          "chromedriver": "/home/hatch/.cache/vibium/chrome-for-testing/156.0.8078.47/chromedriver",
+          "firefox": "/home/hatch/workspace/webdriver-bidi-capability-matrix/tools/firefox/firefox/firefox",
+          "geckodriver": "/home/hatch/workspace/webdriver-bidi-capability-matrix/tools/mcp/node_modules/.bin/geckodriver"
+        },
+        "session": {
+          "mcp-server": "0.10.6",
+          "tools": "49",
+          "has-cookie-tool": "false",
+          "has-intercept-tool": "false"
+        }
+      },
+      "summary": {
+        "pass": 11,
+        "fail": 0,
+        "skip": 4
+      },
+      "exitCode": 0,
+      "error": null,
+      "durationMs": 30411,
+      "ran": true
+    },
+    "wdio-mcp": {
+      "label": "WebdriverIO MCP",
+      "notes": "tools/wdio-mcp/NOTES.md",
+      "cells": {
+        "navigation": "PASS",
+        "console-log": "SKIP",
+        "js-error": "SKIP",
+        "network-capture": "SKIP",
+        "script-eval": "PASS",
+        "cookie": "PASS",
+        "screenshot": "PASS",
+        "dialog": "SKIP",
+        "input-click": "PASS",
+        "network-intercept": "PASS",
+        "drag-and-drop": "SKIP",
+        "hover": "SKIP",
+        "keyboard": "PASS",
+        "multi-tab": "PASS",
+        "iframe": "PASS"
+      },
+      "details": {
+        "navigation": "tab url ends /second",
+        "console-log": "no console tool in the server tool list (base 17 + gated 23 tools)",
+        "js-error": "no error tool in the server tool list",
+        "network-capture": "no network-list tool in the server tool list (mock records calls but does not list network traffic)",
+        "script-eval": "1+1=2 title=BiDi Probe via execute_script (return-form)",
+        "cookie": "probe=chocochip via set_cookie + get_cookies",
+        "screenshot": "bytes=26575 png-signature=yes",
+        "dialog": "no dialog tool in the server tool list",
+        "input-click": "Hello, Ada via set_value + click_element",
+        "network-intercept": "fetch-result=intercepted mock-calls=1",
+        "drag-and-drop": "no drag tool in the server tool list; perform_actions has only click/fill/select/check/uncheck/press, no drag primitive",
+        "hover": "no hover tool in the server tool list; perform_actions has no hover primitive",
+        "keyboard": "key-result=arrow-right via press_key ArrowRight",
+        "multi-tab": "new tab index 1 showed Second page; returned to tab 0",
+        "iframe": "inner-result=inner-clicked via switch_frame + click_element"
+      },
+      "timings": {
+        "navigation": 1572,
+        "console-log": 0,
+        "js-error": 1,
+        "network-capture": 0,
+        "script-eval": 689,
+        "cookie": 693,
+        "screenshot": 732,
+        "dialog": 0,
+        "input-click": 1392,
+        "network-intercept": 928,
+        "drag-and-drop": 5,
+        "hover": 0,
+        "keyboard": 1075,
+        "multi-tab": 1445,
+        "iframe": 1977
+      },
+      "session": {
+        "tools": "23",
+        "base-tools": "17",
+        "has-cookie-tool": "true",
+        "has-mock-tool": "true",
+        "browser": "Chrome/156.0.0.0"
+      },
+      "setup": {
+        "toolPackage": "@wdio/mcp",
+        "toolVersion": "4.0.1",
+        "browser": "Chrome/156.0.0.0",
+        "driver": "server-managed (not probed)",
+        "binaryPaths": {
+          "chrome": "/home/hatch/.cache/vibium/chrome-for-testing/156.0.8078.47/chrome",
+          "chromedriver": "/home/hatch/.cache/vibium/chrome-for-testing/156.0.8078.47/chromedriver",
+          "firefox": "/home/hatch/workspace/webdriver-bidi-capability-matrix/tools/firefox/firefox/firefox",
+          "geckodriver": "/home/hatch/workspace/webdriver-bidi-capability-matrix/tools/mcp/node_modules/.bin/geckodriver"
+        },
+        "session": {
+          "tools": "23",
+          "base-tools": "17",
+          "has-cookie-tool": "true",
+          "has-mock-tool": "true",
+          "browser": "Chrome/156.0.0.0"
+        }
+      },
+      "summary": {
+        "pass": 9,
+        "fail": 0,
+        "skip": 6
+      },
+      "exitCode": 0,
+      "error": null,
+      "durationMs": 46772,
+      "ran": true
+    },
+    "testplane-mcp": {
+      "label": "Testplane MCP",
+      "notes": "tools/testplane-mcp/NOTES.md",
+      "cells": {
+        "navigation": "PASS",
+        "console-log": "SKIP",
+        "js-error": "PASS",
+        "network-capture": "SKIP",
+        "script-eval": "PASS",
+        "cookie": "SKIP",
+        "screenshot": "PASS",
+        "dialog": "SKIP",
+        "input-click": "PASS",
+        "network-intercept": "SKIP",
+        "drag-and-drop": "SKIP",
+        "hover": "PASS",
+        "keyboard": "SKIP",
+        "multi-tab": "PASS",
+        "iframe": "SKIP"
+      },
+      "details": {
+        "navigation": "href ends /second via navigate + run-code",
+        "console-log": "console tool surfaces WARNING/SEVERE (probe-warn returned) but not INFO console.log (probe-log never returned)",
+        "js-error": "probe-thrown surfaced via console tool (SEVERE javascript entry)",
+        "network-capture": "no network-list tool in the server tool list",
+        "script-eval": "1+1=2 title=BiDi Probe via run-code",
+        "cookie": "no cookie get/set tool in the server tool list (save-state/restore-state persist state, not cookie access)",
+        "screenshot": "bytes=22313 png-signature=yes",
+        "dialog": "no dialog tool in the server tool list",
+        "input-click": "Hello, Ada via type + click",
+        "network-intercept": "no mock/intercept tool in the server tool list",
+        "drag-and-drop": "no drag tool in the server tool list (24 tools)",
+        "hover": "hover-result=hovered via hover tool",
+        "keyboard": "no press-key tool in the server tool list; type is text-only and cannot send ArrowRight",
+        "multi-tab": "new tab showed Second page; tabs after click: ✅ Retrieved list of browser tabs |  | ## Browser Tabs |  |   1. Title: BiDi Probe; URL: http://127.0.0.1:4333/ (current) |  |   2. Title: BiDi Probe — Second; URL: http://127.0.0.1:4333/second ",
+        "iframe": "no frame tool in the server tool list (24 tools); run-code is observation-only by the matrix design rule, so it cannot substitute for frame interaction"
+      },
+      "timings": {
+        "navigation": 10275,
+        "console-log": 20691,
+        "js-error": 5257,
+        "network-capture": 0,
+        "script-eval": 5148,
+        "cookie": 1,
+        "screenshot": 5218,
+        "dialog": 1,
+        "input-click": 5319,
+        "network-intercept": 0,
+        "drag-and-drop": 0,
+        "hover": 5303,
+        "keyboard": 0,
+        "multi-tab": 6152,
+        "iframe": 0
+      },
+      "session": {
+        "tools": "24",
+        "has-cookie-tool": "false",
+        "has-intercept-tool": "false"
+      },
+      "setup": {
+        "toolPackage": "@testplane/mcp",
+        "toolVersion": "0.9.0",
+        "browser": "Chrome (server-managed)",
+        "driver": "server-managed (not probed)",
+        "binaryPaths": {
+          "chrome": "/home/hatch/.cache/vibium/chrome-for-testing/156.0.8078.47/chrome",
+          "chromedriver": "/home/hatch/.cache/vibium/chrome-for-testing/156.0.8078.47/chromedriver",
+          "firefox": "/home/hatch/workspace/webdriver-bidi-capability-matrix/tools/firefox/firefox/firefox",
+          "geckodriver": "/home/hatch/workspace/webdriver-bidi-capability-matrix/tools/mcp/node_modules/.bin/geckodriver"
+        },
+        "session": {
+          "tools": "24",
+          "has-cookie-tool": "false",
+          "has-intercept-tool": "false"
+        }
+      },
+      "summary": {
+        "pass": 7,
+        "fail": 0,
+        "skip": 8
+      },
+      "exitCode": 0,
+      "error": null,
+      "durationMs": 89315,
+      "ran": true
+    }
+  }
+}
