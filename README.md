@@ -1,6 +1,6 @@
 # WebDriver BiDi capability matrix
 
-Which automation tools can actually do what over **WebDriver BiDi** — measured
+Which automation tools can actually do what over **WebDriver BiDi**, measured
 by running the same probe page through each tool, not by reading docs.
 
 ## What this is
@@ -21,7 +21,7 @@ by running the same probe page through each tool, not by reading docs.
 
 ## Scope: stable releases only, BiDi-supporting tools only
 
-"Stable" means a shipped tool release — not a finished W3C Recommendation
+"Stable" means a shipped tool release, not a finished W3C Recommendation
 (the BiDi spec itself is still a Working Draft) and not a dev build or an
 experimental flag presented as support. Where a tool needs a documented
 stable opt-in for BiDi (Puppeteer's `protocol` option, Testplane's
@@ -48,15 +48,15 @@ Tools included (each has a suite + NOTES.md):
 | Testplane MCP | 0.9.0 + Chrome (server-managed) | 7 PASS, 8 SKIP (console-log, network-capture, cookie, dialog, network-intercept, drag-and-drop, keyboard, iframe) |
 
 Cross-tool findings worth knowing before the table: on Firefox, pointer
-drag never produces HTML5 drag events — Vibium, Puppeteer, Selenium, and
+drag never produces HTML5 drag events. Vibium, Puppeteer, Selenium, and
 the WDIO stack all run their drag without error and never get a drop,
 while every Chrome drag passes. The Firefox drag cells are therefore
-SKIP (mapper no-op, demonstrated, with a poll so a future fix flips them
-to PASS), not per-tool FAILs. Conversely, Selenium's iframe cell is SKIP
-on Chrome (frame input is a mapper no-op there) but PASS on Firefox —
-geckodriver delivers frame input where chromedriver's mapper does not.
-And the two network-intercept FAILs (WebdriverIO and Testplane on
-Firefox) share one root cause: their mock provides the response body at
+SKIP, not per-tool FAILs: each suite runs its drag without error and never
+gets a drop, so the capability is recorded as not covered rather than
+broken. Conversely, Selenium's iframe cell is SKIP on Chrome but PASS on
+Firefox: geckodriver delivers frame input where chromedriver's mapper
+does not. And the two network-intercept FAILs (WebdriverIO and Testplane
+on Firefox) share one root cause: their mock provides the response body at
 `responseStarted`, but Firefox's BiDi `network.provideResponse` only
 accepts a body in `beforeRequestSent`.
 
@@ -66,16 +66,16 @@ Tools **excluded on purpose** (not implemented, not oversights):
 |---|---|
 | Playwright | Its BiDi support is experimental only, not stable. |
 | Chrome DevTools MCP | It drives Chrome over CDP (via Puppeteer), not BiDi. |
-| Nightwatch | No verified first-class BiDi API found — only indirect/inherited BiDi through internals. |
+| Nightwatch | No verified first-class BiDi API found: only indirect/inherited BiDi through internals. |
 
-Nothing in scope is pending: every BiDi-supporting tool above has a suite
-and a NOTES.md, including a Firefox variant of each direct Chrome tool.
-Cypress and the Firefox DevTools MCP entry are Firefox-only by nature
-(see their NOTES.md for the transport caveats — Cypress specs expose no
-raw BiDi events, and the MCP entries are scripted clients, not AI
-agents). The WebdriverIO and Testplane MCP entries drive server-managed
-Chrome instead; their Firefox support (wdio-mcp's `browser` parameter,
-testplane-mcp's `browserName`) is a separate follow-up, not built here.
+Every BiDi-supporting tool above has a suite and a NOTES.md, including a
+Firefox variant of each direct Chrome tool. Cypress and the Firefox
+DevTools MCP entry are Firefox-only by nature (see their NOTES.md for the
+transport caveats: Cypress specs expose no raw BiDi events, and the MCP
+entries are scripted clients, not AI agents). The WebdriverIO and
+Testplane MCP entries drive server-managed Chrome instead. Firefox support
+for those two MCP entries (wdio-mcp's `browser` parameter,
+testplane-mcp's `browserName`) is out of scope for this matrix.
 
 ## How to run
 
@@ -112,11 +112,11 @@ node tools/vibium/suite.cjs       # in another (or puppeteer / selenium)
 WebdriverIO and Testplane need a chromedriver; see their NOTES.md for the
 ports and environment variables (`WDIO_PORT`, `CHROME_BIN`,
 `TESTPLANE_GRID_URL`). Cypress and the Firefox DevTools MCP entry need
-Firefox — the sandbox uses a Mozilla download under `tools/firefox/`
-(gitignored); on a Mac, a system Firefox works (see their NOTES.md). The
-five `-firefox` variants need Firefox plus geckodriver (see each
-variant's NOTES.md for the resolution order and ports; the runner
-manages both in a full run). The
+Firefox. If no Firefox is installed, the runner uses a Mozilla download
+under `tools/firefox/` (gitignored); on a Mac, a system Firefox works
+(see their NOTES.md). The five `-firefox` variants need Firefox plus
+geckodriver (see each variant's NOTES.md for the resolution order and
+ports; the runner manages both in a full run). The
 WebdriverIO and Testplane MCP entries need no user-provided driver: their
 servers provision their own Chrome + chromedriver.
 
@@ -127,26 +127,26 @@ attempt; a cell still missing after that shows as NOT-RUN, never as a guess.
 
 ## How to read MATRIX.md
 
-- **PASS** — the tool performed the capability over BiDi and the probe page
+- **PASS**: the tool performed the capability over BiDi and the probe page
   showed the expected outcome. The detail string next to it is the observed
   evidence (event text, URL, status, values).
-- **FAIL** — the tool attempted it over BiDi and it did not work.
-- **SKIP** — the tool's stable BiDi does not cover the capability. SKIP is
+- **FAIL**: the tool attempted it over BiDi and it did not work.
+- **SKIP**: the tool's stable BiDi does not cover the capability. SKIP is
   not a failure: some tools deliberately keep a capability on their Classic
-  path (WebdriverIO/Testplane screenshots and clicks work fine — just not
+  path (WebdriverIO/Testplane screenshots and clicks work fine, just not
   over BiDi). The detail string says what was demonstrated instead and why.
-- **NOT-RUN** — the suite produced no result for that capability (for
+- **NOT-RUN**: the suite produced no result for that capability (for
   example, the run crashed partway). NOT-RUN is never upgraded to a guess;
   re-run the tool to fill it in.
-- **Per-capability timing** — the timing table shows wall milliseconds per
+- **Per-capability timing**: the timing table shows wall milliseconds per
   capability (including that capability's own page/context setup, excluding
   browser launch), so the speed comparison is per capability, not just the
   rough suite totals in the summary table.
-- **Setup recorded for this run** — the setup table lists the tool, browser,
+- **Setup recorded for this run**: the setup table lists the tool, browser,
   and driver versions actually observed in that run (installed package
   versions; browser versions from the suite's session or a `--version`
   probe of the binary used). "not probed" means the run exposed no version
-  for that slot — it is not a claim. Install steps per tool live in the
+  for that slot: it is not a claim. Install steps per tool live in the
   tool's NOTES.md (linked in the summary table).
 
 ## Layout
@@ -174,13 +174,18 @@ MATRIX.md            generated report (do not hand-edit)
 matrix-results.json  machine-readable results: cells, timings, setup, sessions
 ```
 
-## Sandbox vs a normal Mac
+## Running as root vs a normal user account
 
-This scaffold was built and run in a Linux sandbox that runs as root, so the
-suites add `--no-sandbox` only when root is detected and use cached
-Chrome-for-Testing binaries when present. On a normal user account (for
-example a Mac), the same suites run unmodified against a system Chrome —
-except where a tool's NOTES.md calls out a sandbox-specific finding (notably
-Testplane's `isolation: false` + missing `se:cdp` observation, which is a
-statement about chromedriver 156 in the sandbox, not about Testplane
-generally).
+Some suites need extra Chrome flags when running as root. The Vibium
+suite passes `--no-sandbox` only when it detects root
+(`process.getuid() === 0`), so the same suite runs unmodified on a normal
+user account. The runner uses cached Chrome-for-Testing binaries when
+present (see `run-matrix.cjs`); `CHROME_BIN` overrides the Chrome binary.
+On a normal user account (for example a Mac), the same suites run
+unmodified against a system Chrome.
+
+Environment-specific findings live in each tool's NOTES.md. One example:
+Testplane runs with `isolation: false` because chromedriver 156 exposes
+no `se:cdp` capability; see `tools/testplane/NOTES.md`. That finding is
+specific to chromedriver 156 and may not apply with a driver that
+provides `se:cdp`.
